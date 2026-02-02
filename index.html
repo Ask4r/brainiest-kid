@@ -1,13 +1,123 @@
 <!doctype html>
-<html lang="en">
-  <head>
+<html lang="ru-RU">
+
+<head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>brainiest-kid</title>
-  </head>
-  <body>
-    <div id="root"></div>
+    <title>The Brainiest Kid</title>
+    <meta name="description" content="ThebrainiestKid — это интеллектуальная игра, в которой группа друзей составляет вопросы и соревнуется, кто на них ответит правильно чаще всего.">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+    <link rel="icon" href="/favicon.ico" sizes="48x48">
+    <link rel="icon" href="/favicon.svg" sizes="any" type="image/svg+xml">
+    <link rel="manifest" href="/site.webmanifest">
+    <meta name="theme-color" content="#FFFFFF" media="(prefers-color-scheme: light)">
+    <meta name="theme-color" content="#0D0F1C" media="(prefers-color-scheme: dark)">
+</head>
+
+<body>
+    <div id="root">
+        <style>
+            :root {
+                --spacing: 0.25rem;
+
+                --color-gray-100: rgb(243 244 246);
+                --color-gray-300: rgb(210 214 219);
+                --color-gray-700: rgb(56 66 80);
+                --color-gray-800: rgb(31 42 55);
+                --color-gray-950: rgb(13 18 28);
+
+                --color-brand-500: rgb(41 112 255);
+                --color-brand-600: rgb(21 94 239);
+
+                --spacing-xl: calc(var(--spacing) * 4);
+
+                --font-body: "Inter", -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+                --text-lg: calc(var(--spacing) * 4.5);
+                --text-lg--line-height: calc(var(--spacing) * 7);
+
+
+                --color-bg-primary: white;
+                --color-bg-tertiary: var(--color-gray-100);
+                --color-fg-brand-primary: var(--color-brand-600);
+                --color-text-secondary: var(--color-gray-700);
+
+                @media (prefers-color-scheme: dark) {
+                    --color-bg-primary: var(--color-gray-950);
+                    --color-bg-tertiary: var(--color-gray-800);
+                    --color-fg-brand-primary: var(--color-brand-500);
+                    --color-text-secondary: var(--color-gray-300);
+                }
+            }
+
+            body {
+                margin: 0;
+                background-color: var(--color-bg-primary);
+                color: var(--color-text-secondary);
+
+                -webkit-font-smoothing: antialiased;
+                -moz-osx-font-smoothing: grayscale;
+            }
+
+            .container {
+                min-width: 100vw;
+                min-height: 100vh;
+                display: grid;
+                place-items: center;
+            }
+
+            .loader {
+                display: flex;
+                flex-direction: column;
+                gap: var(--spacing-xl);
+                align-items: center;
+            }
+
+            @keyframes spinning {
+                from {
+                    transform: rotate(0deg);
+                }
+
+                to {
+                    transform: rotate(360deg);
+                }
+            }
+
+            .spinner {
+                width: 56px;
+                height: 56px;
+                animation: spinning 1s linear infinite;
+            }
+
+            .spinner-bg {
+                stroke: var(--color-bg-tertiary);
+            }
+
+            .spinner-fg {
+                stroke: var(--color-fg-brand-primary);
+            }
+
+            .text {
+                margin: 0;
+                font: 500 var(--text-lg)/var(--text-lg--line-height) var(--font-body);
+            }
+        </style>
+        <div class="container">
+            <div class="loader">
+                <div class="spinner">
+                    <svg width="56" height="56" viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle class="spinner-bg" cx="28" cy="28" r="25" stroke-width="6" />
+                        <path class="spinner-fg"
+                            d="M28 3C31.283 3 34.5339 3.64664 37.5671 4.90301C40.6002 6.15938 43.3562 8.00087 45.6777 10.3223C47.9991 12.6438 49.8406 15.3998 51.097 18.4329C52.3534 21.4661 53 24.717 53 28"
+                            stroke-width="6" stroke-linecap="round" />
+                    </svg>
+                </div>
+                <p class="text">
+                    Загрузка...
+                </p>
+            </div>
+        </div>
+    </div>
     <script type="module" src="/src/main.tsx"></script>
-  </body>
+</body>
+
 </html>
