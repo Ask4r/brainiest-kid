@@ -3,11 +3,14 @@ import { BrowserRouter, Route, Routes } from "react-router";
 import { RouteProvider } from "@/app/providers/route-provider";
 import { ThemeProvider } from "@/ui/providers/theme-provider";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { MainLayout } from "./app/layouts/MainLayout";
+import { MainLayout } from "@/app/layouts/MainLayout";
 import { NotFoundPage } from "@/app/pages/404/NotFoundPage";
 import { LoadingScreen } from "@/app/components/LoadingScreen";
 
 const HomePage = lazy(() => import("@/app/pages/home/HomePage"));
+const JoinPage = lazy(() => import("@/app/pages/join/JoinPage"));
+const CreatePage = lazy(() => import("@/app/pages/create/CreatePage"));
+const LobbyPage = lazy(() => import("@/app/pages/lobby/LobbyPage"));
 
 const queryClient = new QueryClient();
 
@@ -24,6 +27,30 @@ export default function App() {
                   element={(
                     <MainLayout>
                       <HomePage />
+                    </MainLayout>
+                  )}
+                />
+                <Route
+                  path="/join-game"
+                  element={(
+                    <MainLayout>
+                      <JoinPage />
+                    </MainLayout>
+                  )}
+                />
+                <Route
+                  path="/create-game"
+                  element={(
+                    <MainLayout>
+                      <CreatePage />
+                    </MainLayout>
+                  )}
+                />
+                <Route
+                  path="/lobby"
+                  element={(
+                    <MainLayout>
+                      <LobbyPage />
                     </MainLayout>
                   )}
                 />
