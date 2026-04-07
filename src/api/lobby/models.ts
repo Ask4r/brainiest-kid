@@ -4,6 +4,6 @@ export interface SessionPlayersResponseDTO {
   name: string;
   score: number;
   is_connected: boolean;
-  is_host: boolean;
   is_eliminated: boolean;
+  is_pending: boolean;
 }

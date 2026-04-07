@@ -1,18 +1,15 @@
-import { useState } from "react";
 import { Button } from "@/ui/components/base/buttons/button";
-import { Input } from "@/ui/components/base/input/input";
 import { useCreateSession } from "@/api/session/hooks";
 import { useNavigate } from "react-router";
 
 
 export default function CreatePage() {
   const navigate = useNavigate();
-  const [uname, setUname] = useState("");
 
   const { mutate: createSession } = useCreateSession();
 
   const onClick = () => {
-    createSession({ name: uname }, {
+    createSession(undefined, {
       onSuccess() {
         navigate("/lobby");
       },
@@ -24,7 +21,7 @@ export default function CreatePage() {
 
   return (
     <main className="section-container my-24 flex flex-col">
-      <Input label="Имя" onChange={setUname} />
+      <span className="text-tertiary">Здесь будет ввод файла</span>
       <Button onClick={onClick}>Create</Button>
     </main>
   );

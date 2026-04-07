@@ -1,12 +1,11 @@
 import { ofetch } from "ofetch";
 
-const API_URL = import.meta.env.VITE_API_URL;
+const API_URL = import.meta.env.VITE_HTTP_API_URL;
+if (!API_URL) {
+  throw Error("ERROR: \"VITE_HTTP_API_URl\" environment variable is not specified. Check your \".env\".");
+}
 
 export const apiFetch = ofetch.create({
-  baseURL: `http://${API_URL}`,
+  baseURL: API_URL,
 });
-
-export function createWebSocket(url: string) {
-  return new WebSocket(`ws://${API_URL}${url}`);
-}
 

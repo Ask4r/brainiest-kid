@@ -1,23 +1,20 @@
 import { apiFetch } from "@/api/utils/apiFetch";
 import type { CreateSessionResponse, JoinSessionResponse } from "./models";
 
-const API_ENDPOINT = "";
+const API_ENDPOINT = "/sessions";
 
-export function createSession(name: string) {
-  return apiFetch<CreateSessionResponse>(`${API_ENDPOINT}/sessions`, {
+export function createSession() {
+  return apiFetch<CreateSessionResponse>(`${API_ENDPOINT}`, {
     method: "POST",
-    body: {
-      name,
-    }
   });
 }
 
-export function joinSession(sessionCode: number, name: string) {
-  return apiFetch<JoinSessionResponse>(`${API_ENDPOINT}/sessions/join`, {
+export function joinSession(code: number, name: string) {
+  return apiFetch<JoinSessionResponse>(`${API_ENDPOINT}/join`, {
     method: "POST",
     body: {
       name,
-      code: sessionCode,
+      code,
     }
   });
 }

@@ -1,22 +1,14 @@
-import { apiFetch, createWebSocket } from "@/api/utils/apiFetch";
+import { apiFetch } from "@/api/utils/apiFetch";
 import type { SessionPlayersResponseDTO } from "./models";
 
-const API_ENDPOINT = "";
+const API_ENDPOINT = "/sessions";
 
 export function getPlayers(code: number) {
-  return apiFetch<SessionPlayersResponseDTO[]>(`${API_ENDPOINT}/sessions/${code}/players`);
+  return apiFetch<SessionPlayersResponseDTO[]>(`${API_ENDPOINT}/${code}/players`);
 }
 
 export function kickPlayer(playerId: string) {
-  return apiFetch<never>(`${API_ENDPOINT}/sessions/kick/${playerId}`, {
+  return apiFetch<never>(`${API_ENDPOINT}/kick/${playerId}`, {
     method: "DELETE",
   });
-}
-
-export function hostPlayersListSocket(code: number) {
-  return createWebSocket(`/ws/host/${code}`);
-}
-
-export function playerPlayersListSocket(playerId: string) {
-  return createWebSocket(`/ws/player/${playerId}`);
 }

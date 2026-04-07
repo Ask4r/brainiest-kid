@@ -1,38 +1,7 @@
-import { useMutation, useQuery } from "@tanstack/react-query";
-import { getPlayers, kickPlayer } from "./services";
-
-const PLAYERS_CACHE_KEYS = ["players"];
-
-interface SessionPlayer {
-  id: string;
-  name: string;
-  score: number;
-  is_host: boolean;
-  is_connected: boolean;
-  is_eliminated: boolean;
-};
-
-export function useSessionPlayers(code: number | undefined) {
-  return useQuery<SessionPlayer[]>({
-    queryKey: PLAYERS_CACHE_KEYS,
-    async queryFn() {
-      const resp = await getPlayers(code!);
-      return resp.map(playerDto => ({
-        id: playerDto.id,
-        name: playerDto.name,
-        score: playerDto.score,
-        is_host: playerDto.is_host,
-        is_connected: playerDto.is_connected,
-        is_eliminated: playerDto.is_eliminated,
-      }));
-    },
-    placeholderData() {
-      return [];
-    },
-    staleTime: Infinity,
-    enabled: code !== undefined,
-  });
-}
+import { useMutation } from "@tanstack/react-query";
+import { useWS } from "@/api/utils/socket";
+import { kickPlayer } from "./services";
+import type { SessionPlayersResponseDTO } from "./models";
 
 export function useKickPlayer() {
   return useMutation({
@@ -42,3 +11,10 @@ export function useKickPlayer() {
   });
 }
 
+export function useSessionPlayersHostSocket(code: number) {
+  return useWS<SessionPlayersResponseDTO[]>(`/ws/host/${code}`);
+}
+
+export function useSessionPlayersPlayerSocket(playerId: string) {
+  return useWS<SessionPlayersResponseDTO[]>(`/ws/player/${playerId}`);
+}
