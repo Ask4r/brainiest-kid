@@ -225,10 +225,10 @@ export function FileUploadDropZone({
                     />
                     <label htmlFor={id} className="flex cursor-pointer">
                         <Button color="link-color" size="md" isDisabled={isDisabled} onClick={() => inputRef.current?.click()}>
-                            Click to upload <span className="md:hidden">and attach files</span>
+                            Нажмите <span className="md:hidden">и прикрепите файл</span>
                         </Button>
                     </label>
-                    <span className="text-sm max-md:hidden">or drag and drop</span>
+                    <span className="text-sm max-md:hidden">или перетяните в поле</span>
                 </div>
                 <p className={cx("text-xs transition duration-100 ease-linear", isInvalid && "text-error-primary")}>
                     {hint || "SVG, PNG, JPG or GIF (max. 800x400px)"}
@@ -286,13 +286,13 @@ export function FileListItemProgressBar({ name, size, progress, failed, type, fi
 
                             <div className="flex items-center gap-1">
                                 {isComplete && <CheckCircle className="size-4 stroke-[2.5px] text-fg-success-primary" />}
-                                {isComplete && <p className="text-sm font-medium text-success-primary">Complete</p>}
+                                {isComplete && <p className="text-sm font-medium text-success-primary">Готово</p>}
 
                                 {!isComplete && !failed && <UploadCloud02 className="stroke-[2.5px size-4 text-fg-quaternary" />}
-                                {!isComplete && !failed && <p className="text-sm font-medium text-quaternary">Uploading...</p>}
+                                {!isComplete && !failed && <p className="text-sm font-medium text-quaternary">Загрузка...</p>}
 
                                 {failed && <XCircle className="size-4 text-fg-error-primary" />}
-                                {failed && <p className="text-sm font-medium text-error-primary">Failed</p>}
+                                {failed && <p className="text-sm font-medium text-error-primary">Ошибка</p>}
                             </div>
                         </div>
                     </div>

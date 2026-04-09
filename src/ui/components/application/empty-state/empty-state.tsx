@@ -123,15 +123,16 @@ function Description(props: ComponentPropsWithRef<"p">) {
     return <p {...props} className={cx("text-center text-sm text-tertiary", size === "lg" && "text-md", props.className)} />;
 }
 
-const EmptyState = Root as typeof Root & {
-    Title: typeof Title
-    Header: typeof Header
-    Footer: typeof Footer
-    Content: typeof Content
-    Description: typeof Description
-    Illustration: typeof Illustration
-    FeaturedIcon: typeof FeaturedIcon
-    FileTypeIcon: typeof FileTypeIcon
+const EmptyState = {
+    Root: Root,
+    Title: Title,
+    Header: Header,
+    Footer: Footer,
+    Content: Content,
+    Description: Description,
+    Illustration: Illustration,
+    FeaturedIcon: FeaturedIcon,
+    FileTypeIcon: FileTypeIcon,
 };
 
 EmptyState.Title = Title;

@@ -28,10 +28,7 @@ function useSessionData() {
 
 export function useIsHost() {
   const data = useSessionData();
-  if (data === undefined) {
-    throw Error("ERROR: user has no active session.");
-  }
-  return data.isHost;
+  return data?.isHost;
 }
 
 export function useHostSessionData() {
