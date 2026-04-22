@@ -26,8 +26,8 @@ function validateUsername(value: string) {
 export default function JoinPage() {
   const navigate = useNavigate();
 
-  const [code, setCode] = useState<number | undefined>(undefined);
-  const [codeError, setCodeError] = useState<string | undefined>(undefined);
+  const [sessionCode, setSessionCode] = useState<number | undefined>(undefined);
+  const [sessionCodeError, setSessionCodeError] = useState<string | undefined>(undefined);
   const [pasted, setPasted] = useState<boolean>(false);
 
   const [username, setUsername] = useState<string>("");
@@ -38,20 +38,20 @@ export default function JoinPage() {
   const { mutate: joinSession } = useJoinSession();
 
   const isValid = () => {
-    return code !== undefined &&
+    return sessionCode !== undefined &&
       username !== "" &&
-      codeError === undefined &&
+      sessionCodeError === undefined &&
       usernameError === undefined;
   };
 
   const handleCodeInput = (value: string) => {
     const error = validateCode(value);
     if (error !== undefined) {
-      setCodeError(error);
+      setSessionCodeError(error);
       return;
     }
-    setCode(parseInt(value));
-    setCodeError(undefined);
+    setSessionCode(parseInt(value));
+    setSessionCodeError(undefined);
   };
 
   const handlePasteClick = () => {
@@ -60,12 +60,12 @@ export default function JoinPage() {
         console.log("Copied text", copied);
         const error = validateCode(copied);
         if (error !== undefined) {
-          setCodeError(error);
+          setSessionCodeError(error);
           return;
         }
-        setCode(parseInt(copied));
+        setSessionCode(parseInt(copied));
         setPasted(true);
-        setCodeError(undefined);
+        setSessionCodeError(undefined);
       });
   };
 
@@ -80,10 +80,10 @@ export default function JoinPage() {
   };
 
   const handleSubmit = () => {
-    if (code === undefined) {
+    if (sessionCode === undefined) {
       return;
     }
-    joinSession({ code: code, name: username }, {
+    joinSession({ sessionCode: sessionCode, name: username }, {
       onSuccess() {
         navigate("/lobby");
       },
@@ -99,10 +99,10 @@ export default function JoinPage() {
 
       <InputGroup
         label="Ключ подключения"
-        hint={codeError !== undefined ? codeError : "Узнайте ключ подключения у создавшего."}
-        value={Number.isNaN(code) ? "" : code?.toString()}
+        hint={sessionCodeError !== undefined ? sessionCodeError : "Узнайте ключ подключения у создавшего."}
+        value={Number.isNaN(sessionCode) ? "" : sessionCode?.toString()}
         maxLength={6}
-        isInvalid={codeError !== undefined}
+        isInvalid={sessionCodeError !== undefined}
         onChange={handleCodeInput}
         trailingAddon={
           <Button color="secondary" iconLeading={pasted ? Check : Copy01} onClick={handlePasteClick}>

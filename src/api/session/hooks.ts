@@ -1,109 +1,69 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { createSession, joinSession } from "./services";
+import { useMutation } from "@tanstack/react-query";
+import { createSession, joinSession, reconnectSessionHost } from "./services";
+import { useGameDataStore } from "@/state/game-data/store";
 
-const SESSION_CACHE_KEYS = ["session"];
-
-interface HostSessionData {
-  code: number;
-};
-
-interface PlayerSessionData {
-  id: string;
-  name: string;
-  sessionId: number;
-  code: number;
-  score: number;
-  isConnected: boolean;
-  isEliminated: boolean;
-};
-
-type SessionData = { isHost: true, data: HostSessionData }
-  | { isHost: false, data: PlayerSessionData };
-
-
-function useSessionData() {
-  const queryClient = useQueryClient();
-  return queryClient.getQueryData<SessionData>(SESSION_CACHE_KEYS);
-}
-
-export function useIsHost() {
-  const data = useSessionData();
-  return data?.isHost;
-}
-
-export function useHostSessionData() {
-  const data = useSessionData();
-  if (data === undefined) {
-    throw Error("ERROR: user has no active session.");
-  }
-  if (!data.isHost) {
-    throw Error("User is player not a host.");
-  }
-  return data.data;
-}
-
-export function usePlayerSessionData() {
-  const data = useSessionData();
-  if (data === undefined) {
-    throw Error("ERROR: user has no active session.");
-  }
-  if (data.isHost) {
-    throw Error("User is host not a player.");
-  }
-  return data.data;
-}
-
+// API endpoints.
 
 export function useCreateSession() {
-  const queryClient = useQueryClient();
+  const setCreateSession = useGameDataStore(state => state.setCreateSession);
+  const flushSession = useGameDataStore(state => state.flushSession);
   return useMutation({
-    mutationFn() {
-      return createSession();
+    mutationFn(gameDataString: string) {
+      return createSession(gameDataString);
     },
-    onSuccess(resp) {
-      queryClient.setQueryData<SessionData>(SESSION_CACHE_KEYS, () => {
-        return {
-          isHost: true,
-          data: {
-            code: resp.code,
-          },
-        };
+    onSuccess(resp, req) {
+      setCreateSession({
+        gameData: JSON.parse(req),
+        sessionCode: resp.session_code,
+        secret: resp.secret,
       });
     },
     onError() {
-      queryClient.setQueryData<SessionData>(SESSION_CACHE_KEYS, () => {
-        return undefined;
-      });
+      flushSession();
     },
   });
 }
 
-export function useJoinSession() {
-  const queryClient = useQueryClient();
+export function useReconnectSessionHost() {
+  const setCreateSession = useGameDataStore(state => state.setCreateSession);
+  const flushSession = useGameDataStore(state => state.flushSession);
   return useMutation({
-    mutationFn(req: { code: number, name: string }) {
-      return joinSession(req.code, req.name);
+    mutationFn(req: { sessionCode: number, secret: string }) {
+      return reconnectSessionHost(req.sessionCode, req.secret);
     },
     onSuccess(resp, req) {
-      queryClient.setQueryData<SessionData>(SESSION_CACHE_KEYS, () => {
-        return {
-          isHost: false,
-          data: {
-            id: resp.id,
-            name: req.name,
-            sessionId: resp.session_id,
-            code: req.code,
-            score: resp.score,
-            isConnected: resp.is_connected,
-            isEliminated: resp.is_eliminated,
-          },
-        };
+      setCreateSession({
+        gameData: JSON.parse(resp.game_data),
+        sessionCode: req.sessionCode,
+        secret: req.secret,
       });
     },
     onError() {
-      queryClient.setQueryData<SessionData>(SESSION_CACHE_KEYS, () => {
-        return undefined;
+      flushSession();
+    },
+  });
+};
+
+export function useJoinSession() {
+  const setJoinSession = useGameDataStore(state => state.setJoinSession);
+  const flushSession = useGameDataStore(state => state.flushSession);
+  return useMutation({
+    mutationFn(req: { sessionCode: number, name: string }) {
+      return joinSession(req.sessionCode, req.name);
+    },
+    onSuccess(resp, req) {
+      setJoinSession({
+        gameData: JSON.parse(resp.game_data),
+        sessionCode: req.sessionCode,
+        playerId: resp.id,
+        name: resp.name,
+        score: resp.score,
+        state: resp.state,
+        turn: resp.turn,
       });
+    },
+    onError() {
+      flushSession();
     },
   });
 }

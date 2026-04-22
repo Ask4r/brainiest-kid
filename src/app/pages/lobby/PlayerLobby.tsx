@@ -1,54 +1,65 @@
-import { useSessionPlayersPlayerSocket } from "@/api/lobby/hooks";
-import { usePlayerSessionData } from "@/api/session/hooks";
-import { EmptyState } from "@/ui/components/application/empty-state/empty-state";
+import { usePlayerSocket } from "@/api/ws/hooks";
+import type { PlayerDataState } from "@/state/game-data/models";
+import { useGameDataStore } from "@/state/game-data/store";
 import { Table, TableCard } from "@/ui/components/application/table/table";
 import { Button } from "@/ui/components/base/buttons/button";
 import { useClipboard } from "@/ui/hooks/use-clipboard";
+import { cx } from "@/ui/utils/cx";
 import { ArrowLeft, Copy02 } from "@untitledui/icons";
 import { Navigate, useNavigate } from "react-router";
 
-function playerStatusString(player: { is_connected: boolean, is_eliminated: boolean }) {
-  if (player.is_eliminated) {
-    return "Выбыл";
+function playerStatusString(player: PlayerDataState) {
+  switch (player.playerState) {
+    case "disconnected": return "Отключился";
+    case "connected": return "В игре";
+    case "pending": return "Ожидает";
+    case "eliminated": return "Выбыл";
+    default:
+      console.error("ERROR: unhandled player state:", player.playerState);
+      return "";
   }
-  if (!player.is_connected) {
-    return "Отключился";
-  }
-  return "В игре";
 }
 
 export function PlayerLobby() {
   const navigate = useNavigate();
-
   const { copy } = useClipboard();
 
-  const sessionData = usePlayerSessionData();
-  const { lastJsonMessage: players, sendJsonMessage } = useSessionPlayersPlayerSocket(sessionData.id);
+  const sessionCode = useGameDataStore(state => state.sessionCode);
+  const playerId = useGameDataStore(state => state.playerId);
+  const players = useGameDataStore(state => state.players);
+  const flushSession = useGameDataStore(state => state.flushSession);
 
-  const isKicked = players !== null && !players.some(player => player.id === sessionData.id);
-  if (isKicked) {
+  const { lastJsonMessage: wsMessage, sendJsonMessage } = usePlayerSocket(playerId);
+
+  const isKicked = wsMessage !== null
+    && wsMessage.action === "kick"
+    && wsMessage.data.player_id === playerId;
+  const isAborted = wsMessage !== null
+    && wsMessage.action === "abort";
+  if (isKicked || isAborted) {
+    flushSession();
     return <Navigate to="/" />;
   }
 
   const handleCodeCopyClick = () => {
-    copy(sessionData.code.toString());
+    copy(sessionCode.toString());
   };
 
   const handleLeaveGameClick = () => {
-    navigate("/");
     sendJsonMessage({ action: "left" });
+    navigate("/");
   };
 
   return (
     <main className="section-container flex flex-col">
       <header className="py-6 flex flex-col gap-4">
-        <Button size="md" color="link-gray" iconLeading={ArrowLeft} href="/" isDisabled={true}>Вернуться</Button>
+        <Button size="md" color="link-gray" className="w-auto" iconLeading={ArrowLeft} href="/" isDisabled={true}>Вернуться</Button>
         <div className="flex flex-col gap-4">
           <div className="flex flex-col gap-0.5">
             <span className="text-primary text-xl font-semibold">Новая игра</span>
             <span className="text-tertiary text-md">
               {"Код подключения: "}
-              <Button color="link-gray" iconTrailing={<Copy02 size={16} />} onClick={handleCodeCopyClick}>{sessionData.code}</Button>
+              <Button color="link-gray" iconTrailing={<Copy02 size={16} />} onClick={handleCodeCopyClick}>{sessionCode}</Button>
             </span>
           </div>
           <div>
@@ -66,9 +77,9 @@ export function PlayerLobby() {
           </Table.Header>
           <Table.Body items={players}>
             {(player) => (
-              <Table.Row id={player.id}>
-                <Table.Cell className="whitespace-nowrap">{player.name}</Table.Cell>
-                <Table.Cell className="whitespace-nowrap">{player.score}</Table.Cell>
+              <Table.Row id={player.playerId} className={cx(player.playerId === playerId && "bg-secondary")}>
+                <Table.Cell className="whitespace-nowrap">{player.playerName}</Table.Cell>
+                <Table.Cell className="whitespace-nowrap">{player.playerScore}</Table.Cell>
                 <Table.Cell className="whitespace-nowrap">{playerStatusString(player)}</Table.Cell>
               </Table.Row>
             )}

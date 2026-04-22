@@ -1,13 +1,13 @@
-import { useIsHost } from "@/api/session/hooks";
 import { EmptyState } from "@/ui/components/application/empty-state/empty-state";
 import { HostLobby } from "./HostLobby";
 import { PlayerLobby } from "./PlayerLobby";
 import { ArrowLeft, X as Close } from "@untitledui/icons";
 import { Button } from "@/ui/components/base/buttons/button";
+import { useGameDataStore } from "@/state/game-data/store";
 
 
 export default function LobbyPage() {
-  const isHost = useIsHost();
+  const isHost = useGameDataStore(state => state.isHost);
 
   return isHost === undefined ? (
     <main className="section-container my-24 flex flex-col">

@@ -1,36 +1,79 @@
-import { useNavigate } from "react-router";
-import { useKickPlayer, useSessionPlayersHostSocket } from "@/api/lobby/hooks";
-import { useHostSessionData } from "@/api/session/hooks";
+import { useHostSocket } from "@/api/ws/hooks";
 import { Button } from "@/ui/components/base/buttons/button";
 import { ArrowLeft, Copy02 } from "@untitledui/icons";
 import { useClipboard } from "@/ui/hooks/use-clipboard";
 import { Table, TableCard } from "@/ui/components/application/table/table";
 import { EmptyState } from "@/ui/components/application/empty-state/empty-state";
+import { useMemo, useState } from "react";
+import { useNavigate } from "react-router";
+import { PlayerSwapModal } from "./PlayerSwapModal";
+import { useGameDataStore } from "@/state/game-data/store";
+import type { PlayerDataState } from "@/state/game-data/models";
 
-function playerStatusString(player: { is_connected: boolean, is_eliminated: boolean }) {
-  if (player.is_eliminated) {
-    return "Выбыл";
+function playerStatusString(player: PlayerDataState) {
+  switch (player.playerState) {
+    case "disconnected": return "Отключился";
+    case "connected": return "В игре";
+    case "pending": return "Ожидает";
+    case "eliminated": return "Выбыл";
+    default:
+      console.error("ERROR: unhandled player state:", player.playerState);
+      return "";
   }
-  if (!player.is_connected) {
-    return "Отключился";
-  }
-  return "В игре";
 }
 
 export function HostLobby() {
   const navigate = useNavigate();
   const { copy } = useClipboard();
 
-  const sessionData = useHostSessionData();
-  const { lastJsonMessage: players, sendJsonMessage } = useSessionPlayersHostSocket(sessionData.code);
-  const { mutate: kickPlayer } = useKickPlayer();
+  const sessionCode = useGameDataStore(state => state.sessionCode);
+  const players = useGameDataStore(state => state.players);
 
-  const letInPlayer = (id: string) => {
+  const { sendJsonMessage } = useHostSocket(sessionCode);
+
+  const joinedPlayers = useMemo(() => {
+    return players.filter(p => p.playerState === "connected");
+  }, [players]);
+
+  const pendingPlayers = useMemo(() => {
+    return players.filter(p => p.playerState === "pending");
+  }, [players]);
+
+  const disconnectedPlayers = useMemo(() => {
+    return players.filter(p => p.playerState === "disconnected");
+  }, [players]);
+
+  const [isSwapModalOpen, setIsSwapModalOpen] = useState<boolean>(false);
+  const [playerSwapNewId, setPlayerSwapNewId] = useState<string | undefined>(undefined);
+
+  const handleKickPlayer = (id: string) => {
+    sendJsonMessage({ action: "kick", player_id: id });
+  };
+
+  const handleLetInPlayer = (id: string) => {
     sendJsonMessage({ action: "let-in", player_id: id });
   };
 
+  const handleLetInSwapPlayer = (newId: string) => {
+    setPlayerSwapNewId(newId);
+    setIsSwapModalOpen(true);
+  };
+
+  const handlePlayerSwapConfirm = (oldId: string) => {
+    sendJsonMessage({
+      action: "swap",
+      player_id: oldId,
+      player_id_swap: playerSwapNewId,
+    });
+    setIsSwapModalOpen(false);
+  };
+
+  const handlePlayerSwapCancel = () => {
+    setIsSwapModalOpen(false);
+  };
+
   const handleCodeCopyClick = () => {
-    copy(sessionData.code.toString());
+    copy(sessionCode.toString());
   };
 
   const handleAbortGameClick = () => {
@@ -48,7 +91,7 @@ export function HostLobby() {
             <span className="text-primary text-xl font-semibold">Новая игра</span>
             <span className="text-tertiary text-md">
               {"Код подключения: "}
-              <Button color="link-gray" iconTrailing={<Copy02 size={16} />} onClick={handleCodeCopyClick}>{sessionData.code}</Button>
+              <Button color="link-gray" iconTrailing={<Copy02 size={16} />} onClick={handleCodeCopyClick}>{sessionCode}</Button>
             </span>
           </div>
           <div className="flex gap-3">
@@ -59,7 +102,7 @@ export function HostLobby() {
       </header>
 
       <TableCard.Root className="my-8">
-        {players?.length > 0 ? (
+        {joinedPlayers.length > 0 ? (
           <Table aria-label="Участники игры">
             <Table.Header>
               <Table.Head id="name" label="Имя" isRowHeader className="w-full max-w-1/4" />
@@ -67,18 +110,14 @@ export function HostLobby() {
               <Table.Head id="status" label="Статус" />
               <Table.Head id="actions" />
             </Table.Header>
-            <Table.Body items={players}>
+            <Table.Body items={joinedPlayers}>
               {(player) => (
-                <Table.Row id={player.id}>
-                  <Table.Cell className="whitespace-nowrap">{player.name}</Table.Cell>
-                  <Table.Cell className="whitespace-nowrap">{player.score}</Table.Cell>
+                <Table.Row id={player.playerId}>
+                  <Table.Cell className="whitespace-nowrap">{player.playerName}</Table.Cell>
+                  <Table.Cell className="whitespace-nowrap">{player.playerScore}</Table.Cell>
                   <Table.Cell className="whitespace-nowrap">{playerStatusString(player)}</Table.Cell>
                   <Table.Cell>
-                    {player.is_connected ? (
-                      <Button color="link-destructive" onClick={() => kickPlayer(player.id)}>Выгнать</Button>
-                    ) : (
-                      <></>
-                    )}
+                    <Button color="link-destructive" onClick={() => handleKickPlayer(player.playerId)}>Выгнать</Button>
                   </Table.Cell>
                 </Table.Row>
               )}
@@ -98,22 +137,22 @@ export function HostLobby() {
 
       <TableCard.Root className="my-8">
         <TableCard.Header title="Ожидают подключения" />
-        {players?.length > 0 ? (
+        {pendingPlayers.length > 0 ? (
           <Table aria-label="Ожидающие игроки">
             <Table.Header hidden>
               <Table.Head id="name" label="Имя" isRowHeader className="w-full max-w-1/4" />
               <Table.Head id="actions" />
               <Table.Head id="actions-alternative" />
             </Table.Header>
-            <Table.Body items={players}>
+            <Table.Body items={pendingPlayers}>
               {(player) => (
-                <Table.Row id={player.id}>
-                  <Table.Cell className="whitespace-nowrap">{player.name}</Table.Cell>
+                <Table.Row id={player.playerId}>
+                  <Table.Cell className="whitespace-nowrap">{player.playerName}</Table.Cell>
                   <Table.Cell>
-                    <Button color="link-color">Впустить</Button>
+                    <Button color="link-color" onClick={() => handleLetInPlayer(player.playerId)}>Впустить</Button>
                   </Table.Cell>
                   <Table.Cell>
-                    <Button color="link-color">Впустить вместо игрока</Button>
+                    <Button color="link-color" onClick={() => handleLetInSwapPlayer(player.playerId)}>Впустить вместо игрока</Button>
                   </Table.Cell>
                 </Table.Row>
               )}
@@ -131,6 +170,12 @@ export function HostLobby() {
         )}
       </TableCard.Root>
 
+      <PlayerSwapModal
+        isOpen={isSwapModalOpen}
+        disconnectedPlayers={disconnectedPlayers}
+        onConfirm={handlePlayerSwapConfirm}
+        onCancel={handlePlayerSwapCancel}
+      />
     </main>
   );
 }

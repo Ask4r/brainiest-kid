@@ -34,17 +34,6 @@ export default function CreatePage() {
 
   const { mutate: createSession } = useCreateSession();
 
-  const handleCreateClick = () => {
-    createSession(undefined, {
-      onSuccess() {
-        navigate("/lobby");
-      },
-      onError(error) {
-        console.error("error", error);
-      },
-    });
-  };
-
   const handleDropFiles = (files: FileList) => {
     const file = files[0];
     const newFileWithId = {
@@ -74,6 +63,24 @@ export default function CreatePage() {
 
     uploadFile(new File([], uploadFile.name, { type: uploadedFile.type }), (progress) => {
       setUploadedFile((prev) => (prev === undefined ? prev : { ...prev, progress, failed: false }));
+    });
+  };
+
+  const handleCreateClick = async () => {
+    if (uploadedFile === undefined) {
+      return;
+    }
+
+    const gameData = await uploadedFile.fileObject.text();
+
+    // Welp...
+    createSession(JSON.stringify(JSON.parse(gameData)), {
+      onSuccess() {
+        navigate("/lobby");
+      },
+      onError(error) {
+        console.error("error", error);
+      },
     });
   };
 

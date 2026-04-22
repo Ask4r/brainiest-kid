@@ -7,10 +7,13 @@ import { MainLayout } from "@/app/layouts/MainLayout";
 import { NotFoundPage } from "@/app/pages/404/NotFoundPage";
 import { LoadingScreen } from "@/app/components/LoadingScreen";
 
+import TestPage from "./app/pages/test/TestPage";
+
 const HomePage = lazy(() => import("@/app/pages/home/HomePage"));
 const JoinPage = lazy(() => import("@/app/pages/join/JoinPage"));
 const CreatePage = lazy(() => import("@/app/pages/create/CreatePage"));
 const LobbyPage = lazy(() => import("@/app/pages/lobby/LobbyPage"));
+// const Round1Page = lazy(() => import("@/app/pages/round1/Round1Page"));
 
 const queryClient = new QueryClient();
 
@@ -55,10 +58,26 @@ export default function App() {
                   )}
                 />
                 <Route
+                  path="/round1-page"
+                  element={(
+                    <MainLayout>
+                      <LobbyPage />
+                    </MainLayout>
+                  )}
+                />
+                <Route
                   path="*"
                   element={(
                     <MainLayout>
                       <NotFoundPage />
+                    </MainLayout>
+                  )}
+                />
+                <Route
+                  path="/test"
+                  element={(
+                    <MainLayout>
+                      <TestPage />
                     </MainLayout>
                   )}
                 />
