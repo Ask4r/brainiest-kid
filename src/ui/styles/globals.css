@@ -38,11 +38,60 @@ body {
     background-color: var(--color-bg-primary);
 }
 
+/*
+ * AAAAAAAAAAAHHHHHHHHHHHHHH
+ * WHAT IN THE ACTUAL FUCKKKKK!!!!!!!
+ *
+ * SETTING ANY STYLES TO scrollbar-color BREAKS REACT ARIA MODAL.
+ * DO NOT SET scrollbar-color ANYWHERE
+ * IT CANCELS ANIMATIONS RELATED TO COLOR AND BREAKS TRANSITIONS
+ * MAKING MODAL FLICKER AND LOCK IN OPEN AND UNINTERACTABLE STATE.
+ *
+ * RELATED ISSUE:
+ * https://github.com/adobe/react-spectrum/issues/8802
+ */
+
+/*
+ * DONT USE WHAT IS BELOW TOO
+ * -webkit-scrollbal-<something> disables scrollbar arrow buttons and you have
+ * to set them manually.
+ */
+
 /* Scrollbar styles */
-* {
-    scrollbar-color: rgba(255, 255, 255, 0.15) transparent;
-    transition: scrollbar-color linear 1s;
-}
+/* * { */
+/*     scrollbar-color: rgba(255, 255, 255, 0.15) transparent; */
+/*     transition: scrollbar-color linear 1s; */
+/* } */
+
+/* /* Required for other parts to show */ */
+/* ::-webkit-scrollbar { */
+/*   width: 10px; */
+/* } */
+/* /* scrollbar bg */ */
+/* ::-webkit-scrollbar-track { */
+/*   background-color: transparent; */
+/* } */
+/* /* scrollbar draggable */ */
+/* ::-webkit-scrollbar-thumb { */
+/*   background-color: rgba(255, 255, 255, 0.15); */
+/*   background-clip: padding-box; */
+/*   border: 2px solid transparent; */
+/*   border-radius: 50em; */
+/* } */
+/* ::-webkit-scrollbar-thumb:hover { */
+/*   background-color: rgba(255, 255, 255, 0.3); */
+/*   background-clip: padding-box; */
+/*   border: 2px solid transparent; */
+/*   border-radius: 50em; */
+/* } */
+/* /* Style the buttons */ */
+/* ::-webkit-scrollbar-button { */
+/*   display: block; /* Required on some OSs to show buttons */ */
+/*   background-color: transparent; */
+/*   height: 5px; */
+/*   width: 10px; */
+/* } */
+
 
 html,
 body {

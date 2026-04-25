@@ -5,8 +5,8 @@ if (!API_URL) {
   throw Error("ERROR: \"VITE_WS_API_URl\" environment variable is not specified. Check your \".env\".");
 }
 
-export function useAPIWebSocket<T>(url: string, options?: Options) {
-  return useWebSocket<T>(`${API_URL}${url}`, {
+export function useAPIWebSocket<T>(url: string | null, options?: Options) {
+  return useWebSocket<T>(url && `${API_URL}${url}`, {
     retryOnError: true,
     shouldReconnect: () => true,
     ...options,

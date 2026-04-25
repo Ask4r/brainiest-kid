@@ -1,6 +1,7 @@
 import { useMutation } from "@tanstack/react-query";
 import { createSession, joinSession, reconnectSessionHost } from "./services";
 import { useGameDataStore } from "@/state/game-data/store";
+import { flushHostLastSessionData, setHostLastSessionData } from "@/state/game-data/localStorage";
 
 // API endpoints.
 
@@ -15,11 +16,12 @@ export function useCreateSession() {
       setCreateSession({
         gameData: JSON.parse(req),
         sessionCode: resp.session_code,
-        secret: resp.secret,
       });
+      setHostLastSessionData({ sessionCode: resp.session_code, secret: resp.secret });
     },
     onError() {
       flushSession();
+      flushHostLastSessionData();
     },
   });
 }
@@ -35,11 +37,12 @@ export function useReconnectSessionHost() {
       setCreateSession({
         gameData: JSON.parse(resp.game_data),
         sessionCode: req.sessionCode,
-        secret: req.secret,
       });
+      setHostLastSessionData({ sessionCode: resp.session_code, secret: resp.secret });
     },
     onError() {
       flushSession();
+      flushHostLastSessionData();
     },
   });
 };
@@ -56,10 +59,6 @@ export function useJoinSession() {
         gameData: JSON.parse(resp.game_data),
         sessionCode: req.sessionCode,
         playerId: resp.id,
-        name: resp.name,
-        score: resp.score,
-        state: resp.state,
-        turn: resp.turn,
       });
     },
     onError() {

@@ -4,6 +4,7 @@ import { RouteProvider } from "@/app/providers/route-provider";
 import { ThemeProvider } from "@/ui/providers/theme-provider";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { MainLayout } from "@/app/layouts/MainLayout";
+import { WSRouteLayout } from "@/app/layouts/WSRouteLayout";
 import { NotFoundPage } from "@/app/pages/404/NotFoundPage";
 import { LoadingScreen } from "@/app/components/LoadingScreen";
 
@@ -25,8 +26,36 @@ export default function App() {
           <ThemeProvider>
             <Suspense fallback={<LoadingScreen />}>
               <Routes>
+                {/* WS session keep alive routes: begin */}
+                <Route element={<WSRouteLayout />}>
+                  <Route
+                    path="/lobby"
+                    element={(
+                      <MainLayout>
+                        <LobbyPage />
+                      </MainLayout>
+                    )}
+                  />
+                  <Route
+                    path="/round1-page"
+                    element={(
+                      <MainLayout>
+                        <LobbyPage />
+                      </MainLayout>
+                    )}
+                  />
+                  <Route
+                    path="/test"
+                    element={(
+                      <MainLayout>
+                        <TestPage />
+                      </MainLayout>
+                    )}
+                  />
+                </Route>
+                {/* WS session keep alive routes: end */}
                 <Route
-                  path="/"
+                  index
                   element={(
                     <MainLayout>
                       <HomePage />
@@ -50,34 +79,10 @@ export default function App() {
                   )}
                 />
                 <Route
-                  path="/lobby"
-                  element={(
-                    <MainLayout>
-                      <LobbyPage />
-                    </MainLayout>
-                  )}
-                />
-                <Route
-                  path="/round1-page"
-                  element={(
-                    <MainLayout>
-                      <LobbyPage />
-                    </MainLayout>
-                  )}
-                />
-                <Route
                   path="*"
                   element={(
                     <MainLayout>
                       <NotFoundPage />
-                    </MainLayout>
-                  )}
-                />
-                <Route
-                  path="/test"
-                  element={(
-                    <MainLayout>
-                      <TestPage />
                     </MainLayout>
                   )}
                 />
@@ -86,6 +91,6 @@ export default function App() {
           </ThemeProvider>
         </RouteProvider>
       </BrowserRouter>
-    </QueryClientProvider>
+    </QueryClientProvider >
   );
 }

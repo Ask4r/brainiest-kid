@@ -1,4 +1,3 @@
-import { useHostSocket } from "@/api/ws/hooks";
 import { Button } from "@/ui/components/base/buttons/button";
 import { ArrowLeft, Copy02 } from "@untitledui/icons";
 import { useClipboard } from "@/ui/hooks/use-clipboard";
@@ -9,6 +8,7 @@ import { useNavigate } from "react-router";
 import { PlayerSwapModal } from "./PlayerSwapModal";
 import { useGameDataStore } from "@/state/game-data/store";
 import type { PlayerDataState } from "@/state/game-data/models";
+import { useHostActions } from "@/events/hooks";
 
 function playerStatusString(player: PlayerDataState) {
   switch (player.playerState) {
@@ -22,17 +22,17 @@ function playerStatusString(player: PlayerDataState) {
   }
 }
 
-export function HostLobby() {
+export default function HostLobby() {
   const navigate = useNavigate();
   const { copy } = useClipboard();
 
   const sessionCode = useGameDataStore(state => state.sessionCode);
   const players = useGameDataStore(state => state.players);
 
-  const { sendJsonMessage } = useHostSocket(sessionCode);
+  const actions = useHostActions();
 
   const joinedPlayers = useMemo(() => {
-    return players.filter(p => p.playerState === "connected");
+    return players.filter(p => p.playerState !== "pending");
   }, [players]);
 
   const pendingPlayers = useMemo(() => {
@@ -47,11 +47,11 @@ export function HostLobby() {
   const [playerSwapNewId, setPlayerSwapNewId] = useState<string | undefined>(undefined);
 
   const handleKickPlayer = (id: string) => {
-    sendJsonMessage({ action: "kick", player_id: id });
+    actions.kickPlayer(id);
   };
 
   const handleLetInPlayer = (id: string) => {
-    sendJsonMessage({ action: "let-in", player_id: id });
+    actions.letPlayerIn(id);
   };
 
   const handleLetInSwapPlayer = (newId: string) => {
@@ -60,16 +60,10 @@ export function HostLobby() {
   };
 
   const handlePlayerSwapConfirm = (oldId: string) => {
-    sendJsonMessage({
-      action: "swap",
-      player_id: oldId,
-      player_id_swap: playerSwapNewId,
-    });
-    setIsSwapModalOpen(false);
-  };
-
-  const handlePlayerSwapCancel = () => {
-    setIsSwapModalOpen(false);
+    if (playerSwapNewId === undefined) {
+      return;
+    }
+    actions.letPlayerInSwap(oldId, playerSwapNewId);
   };
 
   const handleCodeCopyClick = () => {
@@ -77,7 +71,7 @@ export function HostLobby() {
   };
 
   const handleAbortGameClick = () => {
-    sendJsonMessage({ action: "abort" });
+    actions.abortGame();
     navigate("/");
   };
 
@@ -174,7 +168,7 @@ export function HostLobby() {
         isOpen={isSwapModalOpen}
         disconnectedPlayers={disconnectedPlayers}
         onConfirm={handlePlayerSwapConfirm}
-        onCancel={handlePlayerSwapCancel}
+        onOpenChange={setIsSwapModalOpen}
       />
     </main>
   );

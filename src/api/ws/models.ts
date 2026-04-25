@@ -35,9 +35,7 @@ export type WSActionMessageResponse =
     action: "left";
   } | {
     action: "update-players";
-    data: {
-      players: SessionPlayerResponseDTO[];
-    }
+    data: SessionPlayerResponseDTO[];
   } |
   // Gameplay
   {

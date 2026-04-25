@@ -31,7 +31,6 @@ export default function CreatePage() {
   const navigate = useNavigate();
   const [uploadedFile, setUploadedFile] = useState<UploadedFile | undefined>(undefined);
 
-
   const { mutate: createSession } = useCreateSession();
 
   const handleDropFiles = (files: FileList) => {

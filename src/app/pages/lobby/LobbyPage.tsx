@@ -1,10 +1,12 @@
 import { EmptyState } from "@/ui/components/application/empty-state/empty-state";
-import { HostLobby } from "./HostLobby";
-import { PlayerLobby } from "./PlayerLobby";
 import { ArrowLeft, X as Close } from "@untitledui/icons";
 import { Button } from "@/ui/components/base/buttons/button";
 import { useGameDataStore } from "@/state/game-data/store";
+import { lazy } from "react";
 
+
+const HostLobby = lazy(() => import("./HostLobby"));
+const PlayerLobby = lazy(() => import("./PlayerLobby"));
 
 export default function LobbyPage() {
   const isHost = useGameDataStore(state => state.isHost);

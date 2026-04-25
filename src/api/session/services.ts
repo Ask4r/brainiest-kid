@@ -3,7 +3,6 @@ import type { CreateSessionResponse, JoinSessionResponse } from "./models";
 
 const API_ENDPOINT = "/sessions";
 
-
 export function createSession(gameDataString: string) {
   return apiFetch<CreateSessionResponse>(`${API_ENDPOINT}`, {
     method: "POST",

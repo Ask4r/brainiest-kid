@@ -1,4 +1,4 @@
-import { usePlayerSocket } from "@/api/ws/hooks";
+import { usePlayerActions } from "@/events/hooks";
 import type { PlayerDataState } from "@/state/game-data/models";
 import { useGameDataStore } from "@/state/game-data/store";
 import { Table, TableCard } from "@/ui/components/application/table/table";
@@ -6,7 +6,7 @@ import { Button } from "@/ui/components/base/buttons/button";
 import { useClipboard } from "@/ui/hooks/use-clipboard";
 import { cx } from "@/ui/utils/cx";
 import { ArrowLeft, Copy02 } from "@untitledui/icons";
-import { Navigate, useNavigate } from "react-router";
+import { useNavigate } from "react-router";
 
 function playerStatusString(player: PlayerDataState) {
   switch (player.playerState) {
@@ -20,33 +20,33 @@ function playerStatusString(player: PlayerDataState) {
   }
 }
 
-export function PlayerLobby() {
+export default function PlayerLobby() {
   const navigate = useNavigate();
   const { copy } = useClipboard();
+
+  const actions = usePlayerActions();
 
   const sessionCode = useGameDataStore(state => state.sessionCode);
   const playerId = useGameDataStore(state => state.playerId);
   const players = useGameDataStore(state => state.players);
-  const flushSession = useGameDataStore(state => state.flushSession);
+  // const flushSession = useGameDataStore(state => state.flushSession);
 
-  const { lastJsonMessage: wsMessage, sendJsonMessage } = usePlayerSocket(playerId);
-
-  const isKicked = wsMessage !== null
-    && wsMessage.action === "kick"
-    && wsMessage.data.player_id === playerId;
-  const isAborted = wsMessage !== null
-    && wsMessage.action === "abort";
-  if (isKicked || isAborted) {
-    flushSession();
-    return <Navigate to="/" />;
-  }
+  // const isKicked = wsMessage !== null
+  //   && wsMessage.action === "kick"
+  //   && wsMessage.data.player_id === playerId;
+  // const isAborted = wsMessage !== null
+  //   && wsMessage.action === "abort";
+  // if (isKicked || isAborted) {
+  //   flushSession();
+  //   return <Navigate to="/" />;
+  // }
 
   const handleCodeCopyClick = () => {
     copy(sessionCode.toString());
   };
 
   const handleLeaveGameClick = () => {
-    sendJsonMessage({ action: "left" });
+    actions.leaveGame();
     navigate("/");
   };
 
