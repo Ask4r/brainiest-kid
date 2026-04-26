@@ -26,8 +26,6 @@ export function PlayerSwapModal(props: Props) {
     }
   };
 
-  console.log("modal state", props.isOpen);
-
   return (
     <ModalOverlay isOpen={props.isOpen} onOpenChange={props.onOpenChange}>
       <Modal className="rounded-xl bg-primary h-auto align-middle shadow-xl outline-hidden max-sm:overflow-y-auto sm:rounded-2xl max-h-[calc(var(--visual-viewport-height)-var(--modal-pt)-var(--modal-pb))] sm:max-w-100">

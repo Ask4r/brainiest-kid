@@ -84,7 +84,7 @@ export default function CreatePage() {
   };
 
   return (
-    <main className="section-container my-24 gap-6 flex flex-col">
+    <main className="section-container my-24 max-w-lg gap-6 flex flex-col">
       <Button size="md" color="link-gray" iconLeading={ArrowLeft} href="/">Вернуться</Button>
 
       <FileUpload.Root>

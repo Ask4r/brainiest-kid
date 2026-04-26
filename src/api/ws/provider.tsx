@@ -1,36 +1,23 @@
-import { type PropsWithChildren, useMemo } from "react";
+import { useMemo, type ReactNode } from "react";
 import { WSContext, type WSContextType } from "./context";
 import type { WSActionMessageResponse } from "./models";
 import { useAPIWebSocket } from "../utils/socket";
-import { useGameDataStore } from "@/state/game-data/store";
-import { useHandleWSMsg } from "@/events/hooks";
 
-export function WSProvider({ children }: PropsWithChildren) {
-  const isHost = useGameDataStore(state => state.isHost);
-  const sessionCode = useGameDataStore(state => state.sessionCode);
-  const playerId = useGameDataStore(state => state.playerId);
+interface Props {
+  url: string | null;
+  children: ReactNode;
+  onMessage: (msg: WSActionMessageResponse) => void;
+}
 
-  const handleWSMsg = useHandleWSMsg();
-
-  const url = useMemo(() => {
-    if (sessionCode === 0 && playerId === "") {
-      return null;
-    }
-    if (isHost) {
-      return `/ws/host/${sessionCode}`;
-    } else {
-      return `/ws/player/${playerId}`;
-    }
-  }, [isHost, playerId, sessionCode]);
-
-  const ws = useAPIWebSocket<WSActionMessageResponse>(url, {
+export function WSProvider(props: Props) {
+  const ws = useAPIWebSocket<WSActionMessageResponse>(props.url, {
     share: true,
     onOpen() {
       console.warn("NOT A WARN: WS open.");
     },
     onMessage(event) {
       const msg = JSON.parse(event.data) as WSActionMessageResponse;
-      handleWSMsg(msg);
+      props.onMessage(msg);
     },
     onClose() {
       console.warn("NOT A WARN: WS closed.");
@@ -46,7 +33,7 @@ export function WSProvider({ children }: PropsWithChildren) {
 
   return (
     <WSContext value={ctx}>
-      {children}
+      {props.children}
     </WSContext>
   );
 }

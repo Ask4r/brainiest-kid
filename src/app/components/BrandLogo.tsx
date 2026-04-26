@@ -3,7 +3,7 @@
 import { cx } from "@/ui/utils/cx";
 import { useId, type HTMLAttributes } from "react";
 
-export function SpectraLogo(props: HTMLAttributes<HTMLOrSVGElement>) {
+export function BrandLogo(props: HTMLAttributes<HTMLOrSVGElement>) {
   const prefix = useId();
   return (
     <div {...props} className={cx("flex h-8 w-[142px] items-center justify-start overflow-visible", props.className)}>

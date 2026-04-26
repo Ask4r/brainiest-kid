@@ -66,9 +66,12 @@ export type WSActionMessageResponse =
   } | {
     action: "round1:answered";
     data: {
+      player_id: string;
       question: number;
       is_correct: boolean;
     };
+  } | {
+    action: "round1:show-question";
   } | {
     action: "round1:show-answer";
   } | {

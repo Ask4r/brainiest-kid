@@ -7,7 +7,7 @@ import { cx } from "@/ui/utils/cx";
 import { MobileNavigationHeader } from "./base-components/mobile-header";
 import { NavItemBase } from "./base-components/nav-item";
 import { NavList } from "./base-components/nav-list";
-import { SpectraLogo } from "@/app/components/SpectraLogo";
+import { BrandLogo } from "@/app/components/BrandLogo";
 import { useNavigate } from "react-router";
 
 type NavItem = {
@@ -60,7 +60,7 @@ export function HeaderNavigationBase({
       <MobileNavigationHeader className={className}>
         <aside className="flex h-full max-w-full flex-col overflow-auto border-r border-secondary bg-primary pt-4 lg:pt-6">
           <div className="flex flex-col gap-5 px-4 lg:px-5">
-            <SpectraLogo />
+            <BrandLogo />
             <Input shortcut size="sm" aria-label="Search" placeholder="Search" icon={SearchLg} />
           </div>
 
@@ -83,7 +83,7 @@ export function HeaderNavigationBase({
                 className="rounded-xs outline-focus-ring focus-visible:outline-2 focus-visible:outline-offset-2"
                 onClick={() => navigate("/")}
               >
-                <SpectraLogo />
+                <BrandLogo />
               </a>
 
               <nav className="w-full">

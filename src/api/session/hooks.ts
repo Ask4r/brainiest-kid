@@ -1,68 +1,62 @@
 import { useMutation } from "@tanstack/react-query";
 import { createSession, joinSession, reconnectSessionHost } from "./services";
 import { useGameDataStore } from "@/state/game-data/store";
-import { flushHostLastSessionData, setHostLastSessionData } from "@/state/game-data/localStorage";
-
-// API endpoints.
+import { setHostLastSessionData } from "@/state/game-data/localStorage";
+import { useFlushAllData } from "@/state/hooks";
+import { useUserDataStore } from "@/state/user/store";
 
 export function useCreateSession() {
-  const setCreateSession = useGameDataStore(state => state.setCreateSession);
-  const flushSession = useGameDataStore(state => state.flushSession);
+  const flushAllData = useFlushAllData();
+  const setGameData = useGameDataStore(state => state.setGameData);
+  const setHostData = useUserDataStore(state => state.setHostData);
   return useMutation({
     mutationFn(gameDataString: string) {
       return createSession(gameDataString);
     },
     onSuccess(resp, req) {
-      setCreateSession({
-        gameData: JSON.parse(req),
-        sessionCode: resp.session_code,
-      });
+      setGameData(JSON.parse(req));
       setHostLastSessionData({ sessionCode: resp.session_code, secret: resp.secret });
+      setHostData(resp.session_code);
     },
     onError() {
-      flushSession();
-      flushHostLastSessionData();
+      flushAllData();
     },
   });
 }
 
 export function useReconnectSessionHost() {
-  const setCreateSession = useGameDataStore(state => state.setCreateSession);
-  const flushSession = useGameDataStore(state => state.flushSession);
+  const flushAllData = useFlushAllData();
+  const setGameData = useGameDataStore(state => state.setGameData);
+  const setHostData = useUserDataStore(state => state.setHostData);
   return useMutation({
     mutationFn(req: { sessionCode: number, secret: string }) {
       return reconnectSessionHost(req.sessionCode, req.secret);
     },
     onSuccess(resp, req) {
-      setCreateSession({
-        gameData: JSON.parse(resp.game_data),
-        sessionCode: req.sessionCode,
-      });
+      setGameData(JSON.parse(resp.game_data));
       setHostLastSessionData({ sessionCode: resp.session_code, secret: resp.secret });
+      setHostData(req.sessionCode);
     },
     onError() {
-      flushSession();
-      flushHostLastSessionData();
+      flushAllData();
     },
   });
 };
 
 export function useJoinSession() {
-  const setJoinSession = useGameDataStore(state => state.setJoinSession);
-  const flushSession = useGameDataStore(state => state.flushSession);
+  const flushAllData = useFlushAllData();
+  const setGameData = useGameDataStore(state => state.setGameData);
+  const setPlayerData = useUserDataStore(state => state.setPlayerData);
   return useMutation({
     mutationFn(req: { sessionCode: number, name: string }) {
       return joinSession(req.sessionCode, req.name);
     },
     onSuccess(resp, req) {
-      setJoinSession({
-        gameData: JSON.parse(resp.game_data),
-        sessionCode: req.sessionCode,
-        playerId: resp.id,
-      });
+      setGameData(JSON.parse(resp.game_data));
+      setPlayerData(req.sessionCode, resp.id);
     },
     onError() {
-      flushSession();
+      flushAllData();
     },
   });
 }

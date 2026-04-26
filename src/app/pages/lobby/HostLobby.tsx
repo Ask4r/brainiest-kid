@@ -1,14 +1,14 @@
 import { Button } from "@/ui/components/base/buttons/button";
-import { ArrowLeft, Copy02 } from "@untitledui/icons";
+import { Copy02 } from "@untitledui/icons";
 import { useClipboard } from "@/ui/hooks/use-clipboard";
 import { Table, TableCard } from "@/ui/components/application/table/table";
 import { EmptyState } from "@/ui/components/application/empty-state/empty-state";
 import { useMemo, useState } from "react";
-import { useNavigate } from "react-router";
 import { PlayerSwapModal } from "./PlayerSwapModal";
 import { useGameDataStore } from "@/state/game-data/store";
 import type { PlayerDataState } from "@/state/game-data/models";
-import { useHostActions } from "@/events/hooks";
+import { useUserDataStore } from "@/state/user/store";
+import { useHostGameActions } from "@/events/actions/host/hooks";
 
 function playerStatusString(player: PlayerDataState) {
   switch (player.playerState) {
@@ -23,13 +23,14 @@ function playerStatusString(player: PlayerDataState) {
 }
 
 export default function HostLobby() {
-  const navigate = useNavigate();
   const { copy } = useClipboard();
 
-  const sessionCode = useGameDataStore(state => state.sessionCode);
+  const gameData = useGameDataStore(state => state.gameData);
   const players = useGameDataStore(state => state.players);
 
-  const actions = useHostActions();
+  const sessionCode = useUserDataStore(state => state.sessionCode);
+
+  const actions = useHostGameActions();
 
   const joinedPlayers = useMemo(() => {
     return players.filter(p => p.playerState !== "pending");
@@ -72,24 +73,27 @@ export default function HostLobby() {
 
   const handleAbortGameClick = () => {
     actions.abortGame();
-    navigate("/");
+  };
+
+  const handleProceedClick = () => {
+    actions.startNextRound();
   };
 
 
   return (
-    <main className="section-container flex flex-col">
+    <main className="section-container max-w-4xl flex flex-col">
       <header className="py-6 flex flex-col gap-4">
-        <Button size="md" color="link-gray" iconLeading={ArrowLeft} href="/" isDisabled={true}>Вернуться</Button>
+        {/* <Button size="md" color="link-gray" iconLeading={ArrowLeft} href="/" isDisabled={true}>Вернуться</Button> */}
         <div className="flex flex-col gap-4">
           <div className="flex flex-col gap-0.5">
-            <span className="text-primary text-xl font-semibold">Новая игра</span>
+            <span className="text-primary text-xl font-semibold">{gameData?.name}</span>
             <span className="text-tertiary text-md">
               {"Код подключения: "}
               <Button color="link-gray" iconTrailing={<Copy02 size={16} />} onClick={handleCodeCopyClick}>{sessionCode}</Button>
             </span>
           </div>
           <div className="flex gap-3">
-            <Button size="md">Далее</Button>
+            <Button size="md" onClick={handleProceedClick}>Далее</Button>
             <Button size="md" color="primary-destructive" onClick={handleAbortGameClick}>Завершить игру</Button>
           </div>
         </div>

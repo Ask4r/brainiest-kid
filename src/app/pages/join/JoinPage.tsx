@@ -33,18 +33,19 @@ export default function JoinPage() {
   const [username, setUsername] = useState<string>("");
   const [usernameError, setUsernameError] = useState<string | undefined>(undefined);
 
-  const [apiError, setApiError] = useState<unknown | undefined>(undefined);
-
   const { mutate: joinSession } = useJoinSession();
 
   const isValid = () => {
-    return sessionCode !== undefined &&
-      username !== "" &&
-      sessionCodeError === undefined &&
-      usernameError === undefined;
+    return sessionCode !== undefined
+      && username !== ""
+      && sessionCodeError === undefined
+      && usernameError === undefined;
   };
 
   const handleCodeInput = (value: string) => {
+    if (value.length === 0) {
+      setSessionCode(undefined);
+    }
     const error = validateCode(value);
     if (error !== undefined) {
       setSessionCodeError(error);
@@ -57,7 +58,6 @@ export default function JoinPage() {
   const handlePasteClick = () => {
     navigator.clipboard?.readText()
       .then((copied) => {
-        console.log("Copied text", copied);
         const error = validateCode(copied);
         if (error !== undefined) {
           setSessionCodeError(error);
@@ -87,14 +87,11 @@ export default function JoinPage() {
       onSuccess() {
         navigate("/lobby");
       },
-      onError(error) {
-        setApiError(error);
-      }
     });
   };
 
   return (
-    <main className="section-container my-24 flex flex-col gap-6">
+    <main className="section-container my-24 max-w-lg flex flex-col gap-6">
       <Button size="md" color="link-gray" iconLeading={ArrowLeft} href="/">Вернуться</Button>
 
       <InputGroup
@@ -122,10 +119,6 @@ export default function JoinPage() {
       />
 
       <Button size="lg" isDisabled={!isValid()} onClick={handleSubmit}>Продолжить</Button>
-
-      <div className="text-error-primary">
-        {JSON.stringify(apiError)}
-      </div>
     </main >
   );
 }

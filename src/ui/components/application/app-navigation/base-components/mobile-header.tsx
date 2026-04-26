@@ -10,7 +10,7 @@ import {
     ModalOverlay as AriaModalOverlay,
 } from "react-aria-components";
 import { cx } from "@/ui/utils/cx";
-import { SpectraLogo } from "@/app/components/SpectraLogo";
+import { BrandLogo } from "@/app/components/BrandLogo";
 
 interface Props extends PropsWithChildren {
     className?: string
@@ -23,7 +23,7 @@ export function MobileNavigationHeader({ className, children }: Props) {
                 "flex h-16 items-center justify-between border-b border-secondary bg-primary py-3 pr-2 pl-4 lg:hidden",
                 className
             )}>
-                <SpectraLogo />
+                <BrandLogo />
 
                 <AriaButton
                     aria-label="Expand navigation menu"

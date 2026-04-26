@@ -7,14 +7,15 @@ import { MainLayout } from "@/app/layouts/MainLayout";
 import { WSRouteLayout } from "@/app/layouts/WSRouteLayout";
 import { NotFoundPage } from "@/app/pages/404/NotFoundPage";
 import { LoadingScreen } from "@/app/components/LoadingScreen";
+import { SessionStateGuard } from "@/app/layouts/SessionStateGuard";
 
-import TestPage from "./app/pages/test/TestPage";
+import TestPage from "@/app/pages/test/TestPage";
 
 const HomePage = lazy(() => import("@/app/pages/home/HomePage"));
 const JoinPage = lazy(() => import("@/app/pages/join/JoinPage"));
 const CreatePage = lazy(() => import("@/app/pages/create/CreatePage"));
 const LobbyPage = lazy(() => import("@/app/pages/lobby/LobbyPage"));
-// const Round1Page = lazy(() => import("@/app/pages/round1/Round1Page"));
+const GamePage = lazy(() => import("@/app/pages/game/GamePage"));
 
 const queryClient = new QueryClient();
 
@@ -32,7 +33,9 @@ export default function App() {
                     path="/lobby"
                     element={(
                       <MainLayout>
-                        <LobbyPage />
+                        <SessionStateGuard>
+                          <LobbyPage />
+                        </SessionStateGuard>
                       </MainLayout>
                     )}
                   />
@@ -40,7 +43,9 @@ export default function App() {
                     path="/round1-page"
                     element={(
                       <MainLayout>
-                        <LobbyPage />
+                        <SessionStateGuard>
+                          <LobbyPage />
+                        </SessionStateGuard>
                       </MainLayout>
                     )}
                   />
@@ -48,7 +53,19 @@ export default function App() {
                     path="/test"
                     element={(
                       <MainLayout>
-                        <TestPage />
+                        <SessionStateGuard>
+                          <TestPage />
+                        </SessionStateGuard>
+                      </MainLayout>
+                    )}
+                  />
+                  <Route
+                    path="/game"
+                    element={(
+                      <MainLayout>
+                        <SessionStateGuard>
+                          <GamePage />
+                        </SessionStateGuard>
                       </MainLayout>
                     )}
                   />

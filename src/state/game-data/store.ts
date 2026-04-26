@@ -1,54 +1,66 @@
 import type { GameDataState, GameModeState, PlayerDataState } from "./models";
 import { create } from "zustand";
+import { createJSONStorage, persist } from "zustand/middleware";
 
 interface GameStateStore {
   gameData: GameDataState | undefined;
-  sessionCode: number;
   players: PlayerDataState[];
   currentRound: 0 | 1 | 2 | 3;
   currentMode: GameModeState;
-  // Player data
-  isHost: boolean,
-  playerId: string,
 
-  setCreateSession: (data: { gameData: GameDataState, sessionCode: number }) => void;
-  setJoinSession: (data: { gameData: GameDataState, sessionCode: number, playerId: string }) => void;
-  flushSession: () => void;
+  setGameData: (gameData: GameDataState) => void;
+  flushData: () => void;
 
   updatePlayers: (players: PlayerDataState[]) => void;
+  updatePlayerScore: (playerId: string, addScore: number) => void;
+  startNextRound: () => void;
+  startNextMode: (mode: GameModeState) => void;
 };
 
-export const useGameDataStore = create<GameStateStore>((set, _getState, store) => ({
-  gameData: undefined,
-  sessionCode: 0,
-  players: [],
-  currentRound: 0,
-  currentMode: "default",
-  isHost: false,
-  playerId: "",
+export const useGameDataStore = create<GameStateStore>()(
+  persist((set, _getState, store) => ({
+    gameData: undefined,
+    players: [],
+    currentRound: 0,
+    currentMode: "default",
 
-  setCreateSession({ gameData, sessionCode }) {
-    set({
-      gameData,
-      sessionCode,
-      isHost: true,
-    });
-  },
+    setGameData(gameData: GameDataState) {
+      set({ gameData });
+    },
 
-  setJoinSession({ gameData, sessionCode, playerId }) {
-    set({
-      gameData,
-      sessionCode,
-      isHost: false,
-      playerId,
-    });
-  },
+    flushData() {
+      set(store.getInitialState());
+    },
 
-  flushSession() {
-    set(store.getInitialState());
-  },
+    updatePlayers(players: PlayerDataState[]) {
+      set({ players });
+    },
 
-  updatePlayers(players: PlayerDataState[]) {
-    set({ players, });
-  }
-}));
+    updatePlayerScore(playerId: string, addScore: number) {
+      set(state => ({
+        players: state.players.map(p => {
+          if (p.playerId !== playerId) {
+            return p;
+          }
+          return {
+            ...p,
+            playerScore: p.playerScore + addScore,
+          };
+        }),
+      }));
+    },
+
+    startNextRound() {
+      set(state => ({
+        currentRound: Math.min(3, state.currentRound + 1) as 0 | 1 | 2 | 3,
+      }));
+    },
+
+    startNextMode(mode: GameModeState) {
+      set({ currentMode: mode });
+    },
+  }), {
+    name: "game-state",
+    storage: createJSONStorage(() => sessionStorage),
+  })
+);
