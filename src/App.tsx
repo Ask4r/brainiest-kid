@@ -1,7 +1,7 @@
 import { lazy, Suspense } from "react";
 import { BrowserRouter, Route, Routes } from "react-router";
 import { RouteProvider } from "@/app/providers/route-provider";
-import { ThemeProvider } from "@/ui/providers/theme-provider";
+import { ThemeProvider } from "@/app/providers/theme-provider";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { MainLayout } from "@/app/layouts/MainLayout";
 import { WSRouteLayout } from "@/app/layouts/WSRouteLayout";

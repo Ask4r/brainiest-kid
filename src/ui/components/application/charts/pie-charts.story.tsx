@@ -2,59 +2,39 @@ import type { FC } from "react";
 import * as Charts from "./pie-charts.demo";
 
 export default {
-    title: "Application/Charts",
-    decorators: [
-        (Story: FC) => (
-            <div className="flex min-h-screen items-center justify-center bg-primary py-8">
-                <div className="flex w-full items-center justify-center">
-                    <Story />
-                </div>
-            </div>
-        ),
-    ],
+  title: "Application/Charts",
+  decorators: [
+    (Story: FC) => (
+      <div className="flex min-h-screen items-center justify-center bg-primary py-8">
+        <div className="flex w-full items-center justify-center">
+          <Story />
+        </div>
+      </div>
+    ),
+  ],
 };
 
 export function PieChartXxs() {
-    return (
-        <div className="h-30 w-full max-w-52.5">
-            <Charts.PieChart size="xxs" />
-        </div>
-    );
+  return <Charts.PieChartXxs />;
 }
 PieChartXxs.storyName = "Pie chart xxs";
 
 export function PieChartXs() {
-    return (
-        <div className="h-40 w-full max-w-62.5">
-            <Charts.PieChart size="xs" />
-        </div>
-    );
+  return <Charts.PieChartXs />;
 }
 PieChartXs.storyName = "Pie chart xs";
 
 export function PieChartSm() {
-    return (
-        <div className="h-50 w-full max-w-72.5">
-            <Charts.PieChart />
-        </div>
-    );
+  return <Charts.PieChartSm />;
 }
 PieChartSm.storyName = "Pie chart sm";
 
 export function PieChartMd() {
-    return (
-        <div className="h-60 w-full max-w-96">
-            <Charts.PieChart size="md" />
-        </div>
-    );
+  return <Charts.PieChartMd />;
 }
 PieChartMd.storyName = "Pie chart md";
 
 export function PieChartLg() {
-    return (
-        <div className="h-70 w-full max-w-96">
-            <Charts.PieChart size="lg" />
-        </div>
-    );
+  return <Charts.PieChartLg />;
 }
 PieChartLg.storyName = "Pie chart lg";

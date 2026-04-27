@@ -123,12 +123,12 @@ export default function HostLobby() {
           </Table>
         ) : (
           <div className="flex items-center justify-center overflow-hidden px-8 py-20">
-            <EmptyState.Root size="sm">
+            <EmptyState size="sm">
               <EmptyState.Content>
                 <EmptyState.Title>Нет игроков</EmptyState.Title>
                 <EmptyState.Description>Никто не подключился. Для участия передайте игрокам код подключения.</EmptyState.Description>
               </EmptyState.Content>
-            </EmptyState.Root>
+            </EmptyState>
           </div>
         )}
       </TableCard.Root>
@@ -158,12 +158,12 @@ export default function HostLobby() {
           </Table>
         ) : (
           <div className="flex items-center justify-center overflow-hidden px-8 py-20">
-            <EmptyState.Root size="sm">
+            <EmptyState size="sm">
               <EmptyState.Content>
                 <EmptyState.Title>Нет игроков</EmptyState.Title>
                 <EmptyState.Description>Здесь будут игроки, ожидающие поключения. Для участия передайте игрокам код подключения.</EmptyState.Description>
               </EmptyState.Content>
-            </EmptyState.Root>
+            </EmptyState>
           </div>
         )}
       </TableCard.Root>

@@ -81,7 +81,7 @@ export default function PlayerLobby() {
           </Table>
         ) : (
           <div className="flex items-center justify-center overflow-hidden px-8 py-20">
-            <EmptyState.Root size="sm">
+            <EmptyState size="sm">
               <EmptyState.Header pattern="none">
                 <LoadingIndicator type="line-simple" size="md" />
               </EmptyState.Header>
@@ -89,7 +89,7 @@ export default function PlayerLobby() {
                 <EmptyState.Title>Ожидаем подключения</EmptyState.Title>
                 <EmptyState.Description>Создатель игры должен принят вас. Попросите его впустить вас в игру.</EmptyState.Description>
               </EmptyState.Content>
-            </EmptyState.Root>
+            </EmptyState>
           </div>
         )}
       </TableCard.Root>

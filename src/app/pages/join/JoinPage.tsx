@@ -5,6 +5,7 @@ import { useJoinSession } from "@/api/session/hooks";
 import { useNavigate } from "react-router";
 import { ArrowLeft, Check, Copy01, Key02, User02 } from "@untitledui/icons";
 import { InputGroup } from "@/ui/components/base/input/input-group";
+import { Form } from "@/ui/components/base/form/form";
 
 function validateCode(value: string) {
   if (value.length > 6) {
@@ -92,33 +93,37 @@ export default function JoinPage() {
 
   return (
     <main className="section-container my-24 max-w-lg flex flex-col gap-6">
-      <Button size="md" color="link-gray" iconLeading={ArrowLeft} href="/">Вернуться</Button>
+      <div>
+        <Button size="md" color="link-gray" iconLeading={ArrowLeft} href="/">Вернуться</Button>
+      </div>
 
-      <InputGroup
-        label="Ключ подключения"
-        hint={sessionCodeError !== undefined ? sessionCodeError : "Узнайте ключ подключения у создавшего."}
-        value={Number.isNaN(sessionCode) ? "" : sessionCode?.toString()}
-        maxLength={6}
-        isInvalid={sessionCodeError !== undefined}
-        onChange={handleCodeInput}
-        trailingAddon={
-          <Button color="secondary" iconLeading={pasted ? Check : Copy01} onClick={handlePasteClick}>
-            {pasted ? "" : "Вставить"}
-          </Button>
-        }>
-        <InputBase icon={Key02} placeholder="000000" />
-      </InputGroup>
+      <Form className="flex flex-col gap-6" action={handleSubmit}>
+        <InputGroup
+          label="Ключ подключения"
+          hint={sessionCodeError !== undefined ? sessionCodeError : "Узнайте ключ подключения у создавшего."}
+          value={Number.isNaN(sessionCode) ? "" : sessionCode?.toString()}
+          maxLength={6}
+          isInvalid={sessionCodeError !== undefined}
+          onChange={handleCodeInput}
+          trailingAddon={
+            <Button color="secondary" iconLeading={pasted ? Check : Copy01} onClick={handlePasteClick}>
+              {pasted ? "" : "Вставить"}
+            </Button>
+          }>
+          <InputBase icon={Key02} placeholder="000000" />
+        </InputGroup>
 
-      <Input
-        label="Идентификатор"
-        hint={usernameError !== undefined ? usernameError : "Ваше имя, отображаемое при игре."}
-        icon={User02}
-        isInvalid={usernameError !== undefined}
-        placeholder="Любое имя"
-        onChange={handleUsernameInput}
-      />
+        <Input
+          label="Идентификатор"
+          hint={usernameError !== undefined ? usernameError : "Ваше имя, отображаемое при игре."}
+          icon={User02}
+          isInvalid={usernameError !== undefined}
+          placeholder="Любое имя"
+          onChange={handleUsernameInput}
+        />
 
-      <Button size="lg" isDisabled={!isValid()} onClick={handleSubmit}>Продолжить</Button>
-    </main >
+        <Button size="lg" type="submit" isDisabled={!isValid()}>Продолжить</Button>
+      </Form>
+    </main>
   );
 }
