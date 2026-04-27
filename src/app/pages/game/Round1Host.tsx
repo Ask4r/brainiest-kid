@@ -1,6 +1,6 @@
 import { Button } from "@/ui/components/base/buttons/button";
 import { Timer } from "./Timer";
-import { useCallback, useState } from "react";
+import { useCallback } from "react";
 import { cx } from "@/ui/utils/cx";
 import { useGameDataStore } from "@/state/game-data/store";
 import { useRound1StateStore } from "@/state/round1/store";
@@ -27,17 +27,18 @@ function getIsHostActionButtonDisabled(showQuestion: boolean, outOfTime: boolean
 }
 
 export function Round1Host() {
-  const [outOfTime, setOutOfTime] = useState<boolean>(false);
-
   const gameData = useGameDataStore(state => state.gameData);
 
   const currentQuestionIdx = useRound1StateStore(state => state.currentQuestion);
   const isShowQuestion = useRound1StateStore(state => state.isShowQuestion);
   const isShowAnswer = useRound1StateStore(state => state.isShowAnswer);
+  const timerRemSecs = useRound1StateStore(state => state.timerRemSecs);
 
   const actions = useHostRound1Actions();
 
   const currentQuestion = gameData!.round1.questions[currentQuestionIdx];
+
+  const outOfTime = timerRemSecs === 0;
 
   const handleHostActionButtonClick = () => {
     if (!isShowQuestion) {
@@ -96,7 +97,7 @@ export function Round1Host() {
         </div>
       </div>
       <div className="mb-8">
-        <Timer initialRemainigSecs={6} isActive={isShowQuestion} onElapsed={() => setOutOfTime(true)} />
+        <Timer maxSecs={6} isActive={isShowQuestion} />
       </div>
     </main>
   );

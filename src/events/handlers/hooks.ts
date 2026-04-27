@@ -2,10 +2,12 @@ import type { WSActionMessageResponse } from "@/api/ws/models";
 import { useGameDataStore } from "@/state/game-data/store";
 import { useFlushAllData } from "@/state/hooks";
 import { useRound1StateStore } from "@/state/round1/store";
-import { useNavigate } from "react-router";
+import { useLocation, useNavigate } from "react-router";
 
 export function useHandleWSMsg() {
   const navigate = useNavigate();
+
+  const location = useLocation();
 
   const flushAllData = useFlushAllData();
 
@@ -60,6 +62,9 @@ export function useHandleWSMsg() {
 
       // Round 1
       case "round1:next-question":
+        if (location.pathname !== "/game") {
+          navigate("/game");
+        }
         round1SetNextQuestion(msg.data.question);
         break;
       case "round1:answered":

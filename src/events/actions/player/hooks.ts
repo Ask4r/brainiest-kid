@@ -2,6 +2,8 @@ import { useSessionWS } from "@/api/ws/hooks";
 import { useMemo } from "react";
 import { useNavigate } from "react-router";
 import { useFlushAllData } from "@/state/hooks";
+import { useRound1StateStore } from "@/state/round1/store";
+import { useGameDataStore } from "@/state/game-data/store";
 
 export function usePlayerGameActions() {
   const { sendJsonMessage: msg } = useSessionWS();
@@ -48,13 +50,26 @@ export function useUserTiebreakActions() {
 export function usePlayerRound1Actions() {
   const { sendJsonMessage: msg } = useSessionWS();
 
+  const gameData = useGameDataStore(state => state.gameData)!;
+
+  const setPlayerAnswerSubmitIdx = useRound1StateStore(state => state.setPlayerAnswerSubmitIdx);
+
   return useMemo(() => ({
 
-    round1SubmitAnswer(playerId: string, questionIdx: number, correct: boolean) {
-      msg({ action: "round1:answered", data: { player_id: playerId, question: questionIdx, is_correct: correct } });
+    round1SubmitAnswer(playerId: string, questionIdx: number, submitIdx: number) {
+      const question = gameData.round1.questions[questionIdx];
+      const isCorrect = question.correctIdx === submitIdx;
+      setPlayerAnswerSubmitIdx(submitIdx);
+      msg({
+        action: "round1:answered", data: {
+          player_id: playerId,
+          question: questionIdx,
+          is_correct: isCorrect,
+        }
+      });
     },
 
-  }), [msg]);
+  }), [gameData.round1.questions, msg, setPlayerAnswerSubmitIdx]);
 }
 
 

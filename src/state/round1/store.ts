@@ -1,16 +1,20 @@
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 
+const TIMER_INITIAL_SECS = 6;
+
 interface Round1StateStore {
   currentQuestion: number;
   isShowQuestion: boolean,
   isShowAnswer: boolean;
-  playerLastSubmitAnswerIdx: number | undefined;
+  timerRemSecs: number;
+  playerAnswerSubmitIdx: number | undefined;
 
   setNextQuestion: (newQuestionIdx: number) => void;
   showQuestion: () => void;
   showAnswer: () => void;
-  setPlayerLastSubmitAnswerIdx: (answerIdx: number) => void;
+  decTimer: () => void;
+  setPlayerAnswerSubmitIdx: (answerIdx: number) => void;
   flushData: () => void;
 };
 
@@ -19,13 +23,16 @@ export const useRound1StateStore = create<Round1StateStore>()(
     currentQuestion: 0,
     isShowQuestion: false,
     isShowAnswer: false,
-    playerLastSubmitAnswerIdx: undefined,
+    timerRemSecs: TIMER_INITIAL_SECS,
+    playerAnswerSubmitIdx: undefined,
 
     setNextQuestion(newQuestionIdx: number) {
       set({
         currentQuestion: newQuestionIdx,
         isShowQuestion: false,
         isShowAnswer: false,
+        timerRemSecs: TIMER_INITIAL_SECS,
+        playerAnswerSubmitIdx: undefined,
       });
     },
 
@@ -37,8 +44,12 @@ export const useRound1StateStore = create<Round1StateStore>()(
       set({ isShowAnswer: true });
     },
 
-    setPlayerLastSubmitAnswerIdx(answerIdx: number) {
-      set({ playerLastSubmitAnswerIdx: answerIdx });
+    decTimer() {
+      set(state => ({ timerRemSecs: Math.max(state.timerRemSecs - 1, 0) }));
+    },
+
+    setPlayerAnswerSubmitIdx(answerIdx: number) {
+      set({ playerAnswerSubmitIdx: answerIdx });
     },
 
     flushData() {

@@ -1,15 +1,10 @@
+import { useRound1StateStore } from "@/state/round1/store";
 import { ProgressBarCircle } from "@/ui/components/base/progress-indicators/progress-circles";
-import { useEffect, useImperativeHandle, useState, type RefObject } from "react";
-
-interface Handles {
-  reset: () => void;
-};
+import { useEffect, useRef } from "react";
 
 interface Props {
-  ref?: RefObject<Handles>;
-  initialRemainigSecs: number;
+  maxSecs: number;
   isActive: boolean;
-  onElapsed?: () => void;
 };
 
 function formatter(remSecs: number, _percentage: number) {
@@ -19,41 +14,38 @@ function formatter(remSecs: number, _percentage: number) {
 }
 
 export function Timer(props: Props) {
-  const [remSecs, setRemSecs] = useState<number>(props.initialRemainigSecs);
+  const intervalRef = useRef<number | undefined>(undefined);
 
-  // eslint-disable-next-line react-hooks/refs
-  useImperativeHandle(props.ref, () => ({
-    reset() {
-      setRemSecs(props.initialRemainigSecs);
-    },
-    // eslint-disable-next-line react-hooks/refs
-  }), [props.initialRemainigSecs]);
+  const remSecs = useRound1StateStore(state => state.timerRemSecs);
+  const decRemSecs = useRound1StateStore(state => state.decTimer);
 
   useEffect(() => {
-    let interval = undefined;
     if (!props.isActive) {
-      clearInterval(interval);
+      clearInterval(intervalRef.current);
+      intervalRef.current = undefined;
       return;
     }
-    if (remSecs > 0) {
-      interval = setInterval(() => {
-        setRemSecs((prev) => prev - 1);
-      }, 1000);
-    } else if (remSecs <= 0) {
-      clearInterval(interval);
-      props.onElapsed?.();
+    if (remSecs > 0 && intervalRef.current === undefined) {
+      intervalRef.current = setInterval(decRemSecs, 1000);
+      return;
+    }
+    if (remSecs <= 0) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = undefined;
+      return;
     }
     return () => {
-      clearInterval(interval);
+      clearInterval(intervalRef.current);
+      intervalRef.current = undefined;
     };
-  }, [props, remSecs]);
+  }, [decRemSecs, props, remSecs]);
 
   return (
     <ProgressBarCircle
       size="xs"
       label="Осталось"
       min={0}
-      max={props.initialRemainigSecs}
+      max={props.maxSecs}
       value={remSecs}
       valueFormatter={formatter}
     />

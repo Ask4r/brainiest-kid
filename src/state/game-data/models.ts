@@ -7,7 +7,7 @@ export interface GameDataState {
   round1: {
     questions: {
       question: string;
-      answers: [string, string, string, string];
+      answers: string[];
       correctIdx: number;
     }[];
   };
