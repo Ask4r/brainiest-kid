@@ -75,6 +75,8 @@ export default function HostLobby() {
     actions.abortGame();
   };
 
+  const isProceedButtonDisabled = joinedPlayers.length !== 7;
+
   const handleProceedClick = () => {
     actions.startNextRound();
   };
@@ -93,7 +95,7 @@ export default function HostLobby() {
             </span>
           </div>
           <div className="flex gap-3">
-            <Button size="md" onClick={handleProceedClick}>Далее</Button>
+            <Button size="md" isDisabled={isProceedButtonDisabled} onClick={handleProceedClick}>Далее</Button>
             <Button size="md" color="primary-destructive" onClick={handleAbortGameClick}>Завершить игру</Button>
           </div>
         </div>

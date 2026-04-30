@@ -8,6 +8,11 @@ export const GameDataSchema = z.strictObject({
       question: z.string(),
       answers: z.string().array().length(4),
       correctIdx: z.int().min(0).max(3),
-    }).array(),
+    }).array().length(12),
+    extraQuestions: z.strictObject({
+      question: z.string(),
+      answers: z.string().array().length(4),
+      correctIdx: z.int().min(0).max(3),
+    }).array().length(6),
   }),
 }) satisfies z.ZodType<GameDataState>;

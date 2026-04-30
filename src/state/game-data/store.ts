@@ -13,8 +13,9 @@ interface GameStateStore {
 
   updatePlayers: (players: PlayerDataState[]) => void;
   updatePlayerScore: (playerId: string, addScore: number) => void;
-  startNextRound: () => void;
-  startNextMode: (mode: GameModeState) => void;
+  eliminatePlayers: (playersIds: string[]) => void;
+  setCurrentRound: () => void;
+  setGameMode: (mode: GameModeState) => void;
 };
 
 export const useGameDataStore = create<GameStateStore>()(
@@ -39,24 +40,32 @@ export const useGameDataStore = create<GameStateStore>()(
     updatePlayerScore(playerId: string, addScore: number) {
       set(state => ({
         players: state.players.map(p => {
-          if (p.playerId !== playerId) {
-            return p;
+          if (p.playerId === playerId) {
+            return { ...p, playerScore: p.playerScore + addScore };
           }
-          return {
-            ...p,
-            playerScore: p.playerScore + addScore,
-          };
+          return p;
         }),
       }));
     },
 
-    startNextRound() {
+    eliminatePlayers(playersIds: string[]) {
+      set(state => ({
+        players: state.players.map(p => {
+          if (playersIds.includes(p.playerId)) {
+            return { ...p, status: "eliminated" };
+          }
+          return p;
+        }),
+      }));
+    },
+
+    setCurrentRound() {
       set(state => ({
         currentRound: Math.min(3, state.currentRound + 1) as 0 | 1 | 2 | 3,
       }));
     },
 
-    startNextMode(mode: GameModeState) {
+    setGameMode(mode: GameModeState) {
       set({ currentMode: mode });
     },
   }), {

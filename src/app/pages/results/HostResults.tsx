@@ -1,8 +1,8 @@
 import { EmptyState } from "@/ui/components/application/empty-state/empty-state";
 import { Button } from "@/ui/components/base/buttons/button";
-import { ArrowLeft, X } from "@untitledui/icons";
+import { X } from "@untitledui/icons";
 
-export function NoActiveSessionScreen() {
+export default function HostResults() {
   return (
     <main className="section-container my-24 flex flex-col">
       <EmptyState size="md">
@@ -12,16 +12,15 @@ export function NoActiveSessionScreen() {
 
         <EmptyState.Content>
           <EmptyState.Title>
-            Нет доступных лобби
+            Игра завершилась
           </EmptyState.Title>
           <EmptyState.Description>
-            Кажется, вы не подключены. Узнайте ключ подключения у создателя игры.
+            Победитель определился.
           </EmptyState.Description>
         </EmptyState.Content>
 
         <EmptyState.Footer>
-          <Button iconLeading={ArrowLeft} color="secondary" size="md" href="/">Главная</Button>
-          <Button size="md" href="/join-game">Ввести ключ</Button>
+          <Button size="md" href="/">Главная</Button>
         </EmptyState.Footer>
       </EmptyState>
     </main>

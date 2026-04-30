@@ -8,6 +8,8 @@ interface Round1StateStore {
   isShowQuestion: boolean,
   isShowAnswer: boolean;
   timerRemSecs: number;
+  isExtraQuestions: boolean;
+  extraQuestionsPlayersIds: string[];
   playerAnswerSubmitIdx: number | undefined;
 
   setNextQuestion: (newQuestionIdx: number) => void;
@@ -15,6 +17,7 @@ interface Round1StateStore {
   showAnswer: () => void;
   decTimer: () => void;
   setPlayerAnswerSubmitIdx: (answerIdx: number) => void;
+  startExtraQuestions: (playersIds: string[]) => void;
   flushData: () => void;
 };
 
@@ -25,6 +28,8 @@ export const useRound1StateStore = create<Round1StateStore>()(
     isShowAnswer: false,
     timerRemSecs: TIMER_INITIAL_SECS,
     playerAnswerSubmitIdx: undefined,
+    isExtraQuestions: false,
+    extraQuestionsPlayersIds: [],
 
     setNextQuestion(newQuestionIdx: number) {
       set({
@@ -50,6 +55,14 @@ export const useRound1StateStore = create<Round1StateStore>()(
 
     setPlayerAnswerSubmitIdx(answerIdx: number) {
       set({ playerAnswerSubmitIdx: answerIdx });
+    },
+
+    startExtraQuestions(playersIds: string[]) {
+      set({
+        currentQuestion: 0,
+        isExtraQuestions: true,
+        extraQuestionsPlayersIds: playersIds,
+      });
     },
 
     flushData() {

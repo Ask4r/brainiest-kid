@@ -2,11 +2,12 @@ import { useMemo, type ReactNode } from "react";
 import { WSContext, type WSContextType } from "./context";
 import type { WSActionMessageResponse } from "./models";
 import { useAPIWebSocket } from "../utils/socket";
+import type { SendJsonMessage } from "react-use-websocket/dist/lib/types";
 
 interface Props {
   url: string | null;
   children: ReactNode;
-  onMessage: (msg: WSActionMessageResponse) => void;
+  onMessage: (msg: WSActionMessageResponse, sendMsg: SendJsonMessage) => void;
 }
 
 export function WSProvider(props: Props) {
@@ -17,7 +18,7 @@ export function WSProvider(props: Props) {
     },
     onMessage(event) {
       const msg = JSON.parse(event.data) as WSActionMessageResponse;
-      props.onMessage(msg);
+      props.onMessage(msg, ws.sendJsonMessage);
     },
     onClose() {
       console.warn("NOT A WARN: WS closed.");

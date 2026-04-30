@@ -49,6 +49,9 @@ export type WSActionMessageResponse =
     action: "decoder:finished";
   } | {
     action: "tiebreak:finished";
+    data: {
+      player: string;
+    };
   } | {
     action: "players-eliminated";
     data: {

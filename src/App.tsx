@@ -9,13 +9,13 @@ import { NotFoundPage } from "@/app/pages/404/NotFoundPage";
 import { LoadingScreen } from "@/app/components/LoadingScreen";
 import { SessionStateGuard } from "@/app/layouts/SessionStateGuard";
 
-import TestPage from "@/app/pages/test/TestPage";
-
 const HomePage = lazy(() => import("@/app/pages/home/HomePage"));
 const JoinPage = lazy(() => import("@/app/pages/join/JoinPage"));
 const CreatePage = lazy(() => import("@/app/pages/create/CreatePage"));
 const LobbyPage = lazy(() => import("@/app/pages/lobby/LobbyPage"));
 const GamePage = lazy(() => import("@/app/pages/game/GamePage"));
+const LeaderboardPage = lazy(() => import("@/app/pages/leaderboard/LeaderboardPage"));
+const ResultsPage = lazy(() => import("@/app/pages/results/ResultsPage"));
 
 const queryClient = new QueryClient();
 
@@ -50,21 +50,21 @@ export default function App() {
                     )}
                   />
                   <Route
-                    path="/test"
-                    element={(
-                      <MainLayout>
-                        <SessionStateGuard>
-                          <TestPage />
-                        </SessionStateGuard>
-                      </MainLayout>
-                    )}
-                  />
-                  <Route
                     path="/game"
                     element={(
                       <MainLayout>
                         <SessionStateGuard>
                           <GamePage />
+                        </SessionStateGuard>
+                      </MainLayout>
+                    )}
+                  />
+                  <Route
+                    path="/leaderboard"
+                    element={(
+                      <MainLayout>
+                        <SessionStateGuard>
+                          <LeaderboardPage />
                         </SessionStateGuard>
                       </MainLayout>
                     )}
@@ -92,6 +92,14 @@ export default function App() {
                   element={(
                     <MainLayout>
                       <CreatePage />
+                    </MainLayout>
+                  )}
+                />
+                <Route
+                  path="/results"
+                  element={(
+                    <MainLayout>
+                      <ResultsPage />
                     </MainLayout>
                   )}
                 />

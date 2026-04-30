@@ -10,6 +10,11 @@ export interface GameDataState {
       answers: string[];
       correctIdx: number;
     }[];
+    extraQuestions: {
+      question: string;
+      answers: string[];
+      correctIdx: number;
+    }[];
   };
 };
 

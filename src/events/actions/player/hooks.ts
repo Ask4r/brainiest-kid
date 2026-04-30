@@ -51,6 +51,7 @@ export function usePlayerRound1Actions() {
   const { sendJsonMessage: msg } = useSessionWS();
 
   const gameData = useGameDataStore(state => state.gameData)!;
+  const updatePlayerScore = useGameDataStore(state => state.updatePlayerScore);
 
   const setPlayerAnswerSubmitIdx = useRound1StateStore(state => state.setPlayerAnswerSubmitIdx);
 
@@ -60,6 +61,7 @@ export function usePlayerRound1Actions() {
       const question = gameData.round1.questions[questionIdx];
       const isCorrect = question.correctIdx === submitIdx;
       setPlayerAnswerSubmitIdx(submitIdx);
+      updatePlayerScore(playerId, isCorrect ? 1 : 0);
       msg({
         action: "round1:answered", data: {
           player_id: playerId,

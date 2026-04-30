@@ -26,7 +26,7 @@ function getIsHostActionButtonDisabled(showQuestion: boolean, outOfTime: boolean
   return false;
 }
 
-export function Round1Host() {
+export default function Round1Host() {
   const gameData = useGameDataStore(state => state.gameData);
 
   const currentQuestionIdx = useRound1StateStore(state => state.currentQuestion);

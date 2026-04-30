@@ -5,7 +5,7 @@ import { ArrowLeft, SearchMd } from "@untitledui/icons";
 export function NotFoundPage() {
   return (
     <main className="section-container my-24 flex flex-col">
-      <EmptyState.Root size="lg">
+      <EmptyState size="lg">
         <EmptyState.Header pattern="none">
           <EmptyState.FeaturedIcon color="gray" icon={SearchMd} />
         </EmptyState.Header>
@@ -23,7 +23,7 @@ export function NotFoundPage() {
           <Button iconLeading={ArrowLeft} color="secondary" size="md" href="..">Назад</Button>
           <Button size="md" href="/">Главная</Button>
         </EmptyState.Footer>
-      </EmptyState.Root>
+      </EmptyState>
     </main>
   );
 }
