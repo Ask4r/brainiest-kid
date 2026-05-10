@@ -1,14 +1,23 @@
 import { useReconnectSessionHost } from "@/api/session/hooks";
 import { BrandLogomark } from "@/app/components/BrandLogomark";
 import { getHostLastSessionData } from "@/state/game-data/localStorage";
+import { useGameDataStore } from "@/state/game-data/store";
+import { useFlushAllData } from "@/state/hooks";
 import { Button } from "@/ui/components/base/buttons/button";
 import { FeaturedIcon } from "@/ui/components/foundations/featured-icon/featured-icon";
 import { useNavigate } from "react-router";
 
 export default function HomePage() {
-  const lastSession = getHostLastSessionData();
+
   const navigate = useNavigate();
+
   const { mutate: reconnectSession } = useReconnectSessionHost();
+
+  const lastSession = getHostLastSessionData();
+
+  const isFinished = useGameDataStore(state => state.isFinished);
+
+  const flushAllData = useFlushAllData();
 
   const handleLastSessionClick = () => {
     if (lastSession === undefined) {
@@ -20,6 +29,10 @@ export default function HomePage() {
       },
     });
   };
+
+  if (isFinished) {
+    flushAllData();
+  }
 
   return (
     <main className="section-container my-24 flex flex-col">

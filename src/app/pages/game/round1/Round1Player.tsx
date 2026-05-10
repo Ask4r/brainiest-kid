@@ -5,7 +5,7 @@ import { cx } from "@/ui/utils/cx";
 import { useGameDataStore } from "@/state/game-data/store";
 import { useUserDataStore } from "@/state/user/store";
 import { useRound1StateStore } from "@/state/round1/store";
-import { usePlayerRound1Actions } from "@/events/actions/player/hooks";
+import { usePlayerRound1Actions } from "@/events/actions/player";
 
 export default function Round1Player() {
   const gameData = useGameDataStore(state => state.gameData)!;
@@ -17,22 +17,16 @@ export default function Round1Player() {
   const isShowAnswer = useRound1StateStore(state => state.isShowAnswer);
   const timerRemSecs = useRound1StateStore(state => state.timerRemSecs);
   const submitAnswerIdx = useRound1StateStore(state => state.playerAnswerSubmitIdx);
-  const isExtraQuestions = useRound1StateStore(state => state.isExtraQuestions);
-  const extraQuestionsParticipants = useRound1StateStore(state => state.extraQuestionsPlayersIds);
 
-  const playerActions = usePlayerRound1Actions();
+  const actions = usePlayerRound1Actions();
 
-  const isExtraParticipant = extraQuestionsParticipants.includes(playerId);
-
-  const currentQuestion = isExtraQuestions
-    ? gameData.round1.extraQuestions[currentQuestionIdx]
-    : gameData.round1.questions[currentQuestionIdx];
+  const currentQuestion = gameData.round1.questions[currentQuestionIdx];
 
   const handleAnswerClick = (idx: number) => {
     if (timerRemSecs === 0) {
       return;
     }
-    playerActions.round1SubmitAnswer(playerId, idx, idx);
+    actions.submitAnswer(playerId, currentQuestionIdx, idx);
   };
 
   const isButtonGreen = useCallback((idx: number) => {
@@ -53,7 +47,7 @@ export default function Round1Player() {
     <main className="section-container my-8 max-w-lg flex flex-col">
       <div className="mb-16 flex flex-col gap-4">
         <div className="flex flex-col gap-0.5">
-          <h3 className="text-xl text-primary font-semibold">Раунд 1 {isExtraQuestions && "дополнительные вопросы"}</h3>
+          <h3 className="text-xl text-primary font-semibold">Раунд 1</h3>
           <span className="text-md text-tertiary">Вопрос {currentQuestionIdx + 1}</span>
         </div>
       </div>
@@ -63,23 +57,15 @@ export default function Round1Player() {
             <p className="text-xl text-tertiary">
               {currentQuestion.question}
             </p>
-            {!isExtraQuestions || isExtraParticipant ? (
-              <div className="grid grid-cols-2 gap-3">
-                {currentQuestion.answers.map((ans, idx) => (
-                  <Button key={ans} size="md" color="primary"
-                    isDisabled={isButtonDisabled(idx)}
-                    className={cx(isButtonGreen(idx) && "bg-success-solid")}
-                    onClick={() => handleAnswerClick(idx)}
-                  >{ans}</Button>
-                ))}
-              </div>
-            ) : (
-              <div>
-                <p className="text-xl text-tertiary">
-                  Вы не участвуете в дополнительных раундах.
-                </p>
-              </div>
-            )}
+            <div className="grid grid-cols-2 gap-3">
+              {currentQuestion.answers.map((ans, idx) => (
+                <Button key={ans} size="md" color="primary"
+                  isDisabled={isButtonDisabled(idx)}
+                  className={cx(isButtonGreen(idx) && "bg-success-solid")}
+                  onClick={() => handleAnswerClick(idx)}
+                >{ans}</Button>
+              ))}
+            </div>
           </>
         ) : (
           <p className="text-xl text-tertiary">
@@ -90,6 +76,6 @@ export default function Round1Player() {
       <div className="mb-8">
         <Timer maxSecs={6} isActive={isShowQuestion} />
       </div>
-    </main >
+    </main>
   );
 }

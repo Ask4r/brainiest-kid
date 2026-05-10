@@ -8,7 +8,7 @@ import { PlayerSwapModal } from "./PlayerSwapModal";
 import { useGameDataStore } from "@/state/game-data/store";
 import type { PlayerDataState } from "@/state/game-data/models";
 import { useUserDataStore } from "@/state/user/store";
-import { useHostGameActions } from "@/events/actions/host/hooks";
+import { useHostGameActions } from "@/events/actions/host";
 
 function playerStatusString(player: PlayerDataState) {
   switch (player.playerState) {
@@ -75,9 +75,13 @@ export default function HostLobby() {
     actions.abortGame();
   };
 
-  const isProceedButtonDisabled = joinedPlayers.length !== 7;
+  // const isProceedButtonDisabled = joinedPlayers.length !== 7;
+  const isProceedButtonDisabled = false;
 
   const handleProceedClick = () => {
+    if (isProceedButtonDisabled) {
+      return;
+    }
     actions.startNextRound();
   };
 

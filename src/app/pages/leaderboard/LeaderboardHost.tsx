@@ -1,23 +1,20 @@
-import { useHostRound1Actions } from "@/events/actions/host/hooks";
 import { useGameDataStore } from "@/state/game-data/store";
 import { Table, TableCard } from "@/ui/components/application/table/table";
 import { Button } from "@/ui/components/base/buttons/button";
 import { useMemo } from "react";
+import { useNavigate } from "react-router";
 
 export default function LeaderboardHost() {
-  const players = useGameDataStore(state => state.players);
-  const currentRound = useGameDataStore(state => state.currentRound);
+  const navigate = useNavigate();
 
-  const round1Actions = useHostRound1Actions();
+  const players = useGameDataStore(state => state.players);
 
   const inGamePlayers = useMemo(() => {
     return players.filter(p => p.playerState != "pending");
   }, [players]);
 
   const handleProceedClick = () => {
-    if (currentRound === 1) {
-      round1Actions.round1NextQuestion(6);
-    }
+    navigate("/game");
   };
 
   return (

@@ -1,29 +1,16 @@
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 
-interface TiebreakStateStore {
-  passPlayers: number;
-  participantsIds: string[];
+interface DecoderStateStore {
   answeredPlayersIds: string[];
 
-  setTiebreakParticipants: (passPlayers: number, playersIds: string[]) => void;
   addAnsweredPlayer: (playerId: string) => void;
   flushData: () => void;
 };
 
-export const useTiebreakStateStore = create<TiebreakStateStore>()(
+export const useDecoderStateStore = create<DecoderStateStore>()(
   persist((set, _getState, store) => ({
-    passPlayers: 0,
-    participantsIds: [],
     answeredPlayersIds: [],
-
-    setTiebreakParticipants(passPlayers: number, playersIds: string[]) {
-      set({
-        passPlayers,
-        participantsIds: playersIds,
-        answeredPlayersIds: [],
-      });
-    },
 
     addAnsweredPlayer(playerId: string) {
       set(state => ({
@@ -37,7 +24,7 @@ export const useTiebreakStateStore = create<TiebreakStateStore>()(
       set(store.getInitialState());
     },
   }), {
-    name: "tiebreak-state",
+    name: "decoder-state",
     storage: createJSONStorage(() => sessionStorage),
   })
 );

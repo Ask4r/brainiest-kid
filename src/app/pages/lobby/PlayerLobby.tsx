@@ -1,4 +1,4 @@
-import { usePlayerGameActions } from "@/events/actions/player/hooks";
+import { usePlayerGameActions } from "@/events/actions/player";
 import type { PlayerDataState } from "@/state/game-data/models";
 import { useGameDataStore } from "@/state/game-data/store";
 import { useUserDataStore } from "@/state/user/store";
@@ -9,6 +9,7 @@ import { Button } from "@/ui/components/base/buttons/button";
 import { useClipboard } from "@/ui/hooks/use-clipboard";
 import { cx } from "@/ui/utils/cx";
 import { Copy02 } from "@untitledui/icons";
+import { useMemo } from "react";
 
 function playerStatusString(player: PlayerDataState) {
   switch (player.playerState) {
@@ -33,7 +34,11 @@ export default function PlayerLobby() {
   const sessionCode = useUserDataStore(state => state.sessionCode);
   const playerId = useUserDataStore(state => state.playerId);
 
-  const isPendingPlayer = players.find(p => p.playerId === playerId)?.playerState === "pending";
+  const joinedPlayers = useMemo(() => {
+    return players.filter(p => p.playerState !== "pending");
+  }, [players]);
+
+  const isPendingPlayer = players.find(p => p.playerId === playerId)?.playerState === "pending" || players.length === 0;
 
   const handleCodeCopyClick = () => {
     copy(sessionCode.toString());
@@ -69,7 +74,7 @@ export default function PlayerLobby() {
               <Table.Head id="score" label="Счет" />
               <Table.Head id="status" label="Статус" />
             </Table.Header>
-            <Table.Body items={players}>
+            <Table.Body items={joinedPlayers}>
               {(p) => (
                 <Table.Row id={p.playerId} className={cx(p.playerId === playerId && "bg-secondary")}>
                   <Table.Cell className="whitespace-nowrap">{p.playerId === playerId && "(Вы) "}{p.playerName}</Table.Cell>

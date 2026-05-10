@@ -4,7 +4,7 @@ import { useCallback } from "react";
 import { cx } from "@/ui/utils/cx";
 import { useGameDataStore } from "@/state/game-data/store";
 import { useRound1StateStore } from "@/state/round1/store";
-import { useHostRound1Actions } from "@/events/actions/host/hooks";
+import { useHostRound1Actions } from "@/events/actions/host";
 
 function getHostActionButtonText(showQuestion: boolean, outOfTime: boolean, showAnswer: boolean) {
   if (!showQuestion) {
@@ -42,17 +42,17 @@ export default function Round1Host() {
 
   const handleHostActionButtonClick = () => {
     if (!isShowQuestion) {
-      actions.round1ShowQuestion();
+      actions.showQuestion();
       return;
     }
     if (!outOfTime) {
       return;
     }
     if (!isShowAnswer) {
-      actions.round1ShowCorrectAnswer();
+      actions.showCorrectAnswer();
       return;
     }
-    actions.round1NextQuestion(currentQuestionIdx + 1);
+    actions.nextQuestion(currentQuestionIdx + 1);
   };
 
   const hostActionButtonText = getHostActionButtonText(isShowQuestion, outOfTime, isShowAnswer);

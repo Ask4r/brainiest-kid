@@ -4,6 +4,7 @@ import { useNavigate } from "react-router";
 import { useFlushAllData } from "@/state/hooks";
 import { useRound1StateStore } from "@/state/round1/store";
 import { useGameDataStore } from "@/state/game-data/store";
+import { useRound2StateStore } from "@/state/round2/store";
 
 export function usePlayerGameActions() {
   const { sendJsonMessage: msg } = useSessionWS();
@@ -23,25 +24,25 @@ export function usePlayerGameActions() {
   }), [flushAllData, msg, navigate]);
 }
 
-export function useUserDecoderActions() {
+export function usePlayerDecoderActions() {
   const { sendJsonMessage: msg } = useSessionWS();
 
   return useMemo(() => ({
 
-    finishDecoder() {
-      msg({ action: "decoder:finished" });
+    finish(playerId: string) {
+      msg({ action: "decoder:finished", data: { player: playerId } });
     },
 
   }), [msg]);
 }
 
-export function useUserTiebreakActions() {
+export function usePlayerTiebreakActions() {
   const { sendJsonMessage: msg } = useSessionWS();
 
   return useMemo(() => ({
 
-    finishTiebreak() {
-      msg({ action: "tiebreak:finished" });
+    finish(playerId: string) {
+      msg({ action: "tiebreak:finished", data: { player: playerId } });
     },
 
   }), [msg]);
@@ -57,7 +58,7 @@ export function usePlayerRound1Actions() {
 
   return useMemo(() => ({
 
-    round1SubmitAnswer(playerId: string, questionIdx: number, submitIdx: number) {
+    submitAnswer(playerId: string, questionIdx: number, submitIdx: number) {
       const question = gameData.round1.questions[questionIdx];
       const isCorrect = question.correctIdx === submitIdx;
       setPlayerAnswerSubmitIdx(submitIdx);
@@ -71,21 +72,28 @@ export function usePlayerRound1Actions() {
       });
     },
 
-  }), [gameData.round1.questions, msg, setPlayerAnswerSubmitIdx]);
+  }), [gameData.round1.questions, msg, setPlayerAnswerSubmitIdx, updatePlayerScore]);
 }
 
 
 export function usePlayerRound2Actions() {
   const { sendJsonMessage: msg } = useSessionWS();
 
+  const nextQuestion = useRound2StateStore(state => state.nextQuestion);
+
   return useMemo(() => ({
 
-    round2SkipQuestion() {
-      // TODO
-      console.error("TODO");
-      msg({ action: "round2:question-skip", data: { player_id: "", category_idx: 0, question_idx: 0 } });
+    skipQuestion(playerId: string, questionIdx: number) {
+      nextQuestion(questionIdx);
+      msg({
+        action: "round2:question-skip", data: {
+          player_id: playerId,
+          category_idx: 0,
+          question_idx: questionIdx,
+        }
+      });
     },
 
-  }), [msg]);
+  }), [msg, nextQuestion]);
 }
 

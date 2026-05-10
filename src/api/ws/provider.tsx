@@ -20,11 +20,11 @@ export function WSProvider(props: Props) {
       const msg = JSON.parse(event.data) as WSActionMessageResponse;
       props.onMessage(msg, ws.sendJsonMessage);
     },
-    onClose() {
-      console.warn("NOT A WARN: WS closed.");
+    onClose(event) {
+      console.warn("NOT A WARN: WS closed.", event);
     },
     onError(event) {
-      console.error(event);
+      console.error("ERROR: ws error.", event);
     },
   });
 

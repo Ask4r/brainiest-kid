@@ -1,26 +1,26 @@
 import type { WSActionMessageResponse } from "@/api/ws/models";
+import { useDecoderStateStore } from "@/state/decoder/store";
 import { useGameDataStore } from "@/state/game-data/store";
 import { useFlushAllData } from "@/state/hooks";
-import { usePlayerResultsStore } from "@/state/player-results/store";
 import { useRound1StateStore } from "@/state/round1/store";
+import { useRound2StateStore } from "@/state/round2/store";
 import { useTiebreakStateStore } from "@/state/tiebreak/store";
 import { useUserDataStore } from "@/state/user/store";
 import { useCallback } from "react";
 import { useNavigate } from "react-router";
 import type { SendJsonMessage } from "react-use-websocket/dist/lib/types";
+import { useFinishGame } from "../hooks";
 
-export function useHandleWSMsg() {
+export function usePlayerHandleWSMsg() {
   const navigate = useNavigate();
 
   const flushAllData = useFlushAllData();
 
-  const players = useGameDataStore(state => state.players);
+  const gameData = useGameDataStore(state => state.gameData)!;
   const currentRound = useGameDataStore(state => state.currentRound);
-  const currentMode = useGameDataStore(state => state.currentMode);
   const updatePlayers = useGameDataStore(state => state.updatePlayers);
   const updatePlayerScore = useGameDataStore(state => state.updatePlayerScore);
-  const eliminatePlayers = useGameDataStore(state => state.eliminatePlayers);
-  const startNextRound = useGameDataStore(state => state.setCurrentRound);
+  const setNextRound = useGameDataStore(state => state.setNextRound);
   const startNextMode = useGameDataStore(state => state.setGameMode);
 
   const playerId = useUserDataStore(state => state.playerId);
@@ -28,21 +28,29 @@ export function useHandleWSMsg() {
   const round1SetNextQuestion = useRound1StateStore(state => state.setNextQuestion);
   const round1ShowQuestion = useRound1StateStore(state => state.showQuestion);
   const round1ShowAnswer = useRound1StateStore(state => state.showAnswer);
-  const round1StartExtraQuestions = useRound1StateStore(state => state.startExtraQuestions);
 
-  const tiebreakParticipants = useTiebreakStateStore(state => state.participantsIds);
+  const round2SetCurrentPlayer = useRound2StateStore(state => state.setCurrentPlayer);
+  const round2SelectCategory = useRound2StateStore(state => state.selectCategory);
+  const round2NextQuestion = useRound2StateStore(state => state.nextQuestion);
+  const round2FinishCategory = useRound2StateStore(state => state.finishCategory);
+
   const tiebreakAnsweredPlayers = useTiebreakStateStore(state => state.answeredPlayersIds);
   const tiebreakAddAnsweredPlayer = useTiebreakStateStore(state => state.addAnsweredPlayer);
+  const setTiebreakParticipants = useTiebreakStateStore(state => state.setTiebreakParticipants);
 
-  const setPlayerResults = usePlayerResultsStore(state => state.setPlayerResults);
+  const decoderAddAnsweredPlayer = useDecoderStateStore(state => state.addAnsweredPlayer);
 
-  return useCallback((msg: WSActionMessageResponse, sendMsg: SendJsonMessage) => {
+  const finishGame = useFinishGame();
+
+  return useCallback((msg: WSActionMessageResponse, _sendMsg: SendJsonMessage) => {
     switch (msg.action) {
       case "let-in":
       case "swap":
       case "kick":
       case "left":
+        // Not handled.
         break;
+
       case "abort": {
         flushAllData();
         navigate("/");
@@ -59,37 +67,39 @@ export function useHandleWSMsg() {
         break;
       }
       case "next-round": {
-        startNextRound();
+        if (currentRound === 2) {
+          finishGame(true);
+          break;
+        }
+        setNextRound();
         navigate("/game");
         break;
       }
       case "next-mode": {
-        startNextMode(msg.data.mode);
+        if (msg.data.mode === "tiebreak") {
+          startNextMode("tiebreak");
+          setTiebreakParticipants(msg.data.pass, msg.data.participants);
+        } else {
+          startNextMode(msg.data.mode);
+        }
         break;
       }
       case "decoder:finished": {
-        // TODO
+        decoderAddAnsweredPlayer(msg.data.player);
         break;
       }
       case "tiebreak:finished": {
         if (tiebreakAnsweredPlayers.includes(msg.data.player)) {
           break;
         }
-        const numParticipants = tiebreakParticipants.length;
-        const numAnswered = tiebreakAnsweredPlayers.length;
-        if (numAnswered === numParticipants - 1) {
-          sendMsg({ action: "next-round" });
-        }
         tiebreakAddAnsweredPlayer(msg.data.player);
         break;
       }
       case "players-eliminated": {
         if (msg.data.eliminated_players_ids.includes(playerId)) {
-          const p = players.find(p => p.playerId === playerId);
-          setPlayerResults(false, p?.playerScore ?? 0, currentRound, currentMode);
-          navigate("/results");
+          finishGame(false);
+          break;
         }
-        eliminatePlayers(msg.data.eliminated_players_ids);
         break;
       }
       case "show-leaderboard": {
@@ -103,7 +113,9 @@ export function useHandleWSMsg() {
         break;
       }
       case "round1:answered": {
-        updatePlayerScore(msg.data.player_id, msg.data.is_correct ? 1 : 0);
+        if (msg.data.player_id !== playerId) {
+          updatePlayerScore(msg.data.player_id, msg.data.is_correct ? 1 : 0);
+        }
         break;
       }
       case "round1:show-question": {
@@ -114,30 +126,33 @@ export function useHandleWSMsg() {
         round1ShowAnswer();
         break;
       }
-      case "round1:extra-questions": {
-        round1StartExtraQuestions(msg.data.players);
-        break;
-      }
 
       // Round 2
       case "round2:show-categories": {
         // TODO
         break;
       }
+      case "round2:question-skip": {
+        if (msg.data.player_id === playerId) {
+          // Handled by the caller.
+          break;
+        }
+        round2NextQuestion(msg.data.question_idx);
+        break;
+      }
       case "round2:start-category": {
-        // TODO
+        const maxQuestions = gameData.round2.categories[msg.data.category_idx].questions.length;
+        round2SetCurrentPlayer(msg.data.player_id);
+        round2SelectCategory(msg.data.category_idx, maxQuestions);
         break;
       }
       case "round2:next-question": {
-        // TODO
+        round2NextQuestion(msg.data.question_idx);
         break;
       }
       case "round2:category-answered": {
-        // TODO
-        break;
-      }
-      case "round2:question-skip": {
-        // TODO
+        updatePlayerScore(msg.data.player_id, msg.data.added_score);
+        round2FinishCategory();
         break;
       }
 
@@ -167,5 +182,6 @@ export function useHandleWSMsg() {
         break;
       }
     };
-  }, [currentMode, currentRound, eliminatePlayers, flushAllData, navigate, playerId, players, round1SetNextQuestion, round1ShowAnswer, round1ShowQuestion, round1StartExtraQuestions, setPlayerResults, startNextMode, startNextRound, tiebreakAddAnsweredPlayer, tiebreakAnsweredPlayers, tiebreakParticipants.length, updatePlayerScore, updatePlayers]);
+  }, [flushAllData, navigate, updatePlayers, currentRound, setNextRound, finishGame, startNextMode, setTiebreakParticipants, decoderAddAnsweredPlayer, tiebreakAnsweredPlayers, tiebreakAddAnsweredPlayer, playerId, round1SetNextQuestion, updatePlayerScore, round1ShowQuestion, round1ShowAnswer, round2NextQuestion, gameData.round2.categories, round2SetCurrentPlayer, round2SelectCategory, round2FinishCategory]);
 }
+

@@ -1,4 +1,4 @@
-import type { GameModeResponse, PlayerConnectionStateResponse } from "@/api/session/models";
+import type { PlayerConnectionStateResponse } from "@/api/session/models";
 
 export interface SessionPlayerResponseDTO {
   id: string;
@@ -43,15 +43,24 @@ export type WSActionMessageResponse =
   } | {
     action: "next-mode";
     data: {
-      mode: GameModeResponse;
-    };
+      mode: "default";
+    } | {
+      mode: "tiebreak";
+      pass: number;
+      participants: string[];
+    }
   } | {
     action: "decoder:finished";
+    data: {
+      player: string;
+    };
   } | {
     action: "tiebreak:finished";
     data: {
       player: string;
     };
+  } | {
+    action: "tiebreak:concluded";
   } | {
     action: "players-eliminated";
     data: {

@@ -3,6 +3,7 @@ import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 
 interface GameStateStore {
+  isFinished: boolean;
   gameData: GameDataState | undefined;
   players: PlayerDataState[];
   currentRound: 0 | 1 | 2 | 3;
@@ -14,12 +15,14 @@ interface GameStateStore {
   updatePlayers: (players: PlayerDataState[]) => void;
   updatePlayerScore: (playerId: string, addScore: number) => void;
   eliminatePlayers: (playersIds: string[]) => void;
-  setCurrentRound: () => void;
+  setIsFinished: (value: boolean) => void;
+  setNextRound: () => void;
   setGameMode: (mode: GameModeState) => void;
 };
 
 export const useGameDataStore = create<GameStateStore>()(
   persist((set, _getState, store) => ({
+    isFinished: false,
     gameData: undefined,
     players: [],
     currentRound: 0,
@@ -59,9 +62,14 @@ export const useGameDataStore = create<GameStateStore>()(
       }));
     },
 
-    setCurrentRound() {
+    setIsFinished(value: boolean) {
+      set({ isFinished: value });
+    },
+
+    setNextRound() {
       set(state => ({
         currentRound: Math.min(3, state.currentRound + 1) as 0 | 1 | 2 | 3,
+        currentMode: state.currentRound === 0 ? "default" : "decoder",
       }));
     },
 

@@ -22,9 +22,9 @@ export default function PlayerResults() {
             {isWinner ? "Вы победили!" : "Не самый умный :("}
           </EmptyState.Title>
           <EmptyState.Description>
-            {isWinner ? "Вы обошли остальных игроков." : "Вы выбыли из игры."}
-            Ваш счет: {score}.
-            {!isWinner && `Продержались до ${eliminatedRound} рануда, режим ${eliminatedMode}.`}
+            {isWinner ? "Вы обошли остальных игроков." : "Вы выбыли из игры."}<br/>
+            Ваш счет: {score}.<br/>
+            {!isWinner && `Продержались до ${eliminatedRound} рануда, режим ${eliminatedMode}.`}<br/>
           </EmptyState.Description>
         </EmptyState.Content>
 
